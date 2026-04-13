@@ -30,12 +30,21 @@ export interface Project {
   repositories: Repository[]
 }
 
+export interface StatusHistoryEntry {
+  status: FeatureStatus
+  changedBy: { id: string; email: string }
+  changedAt: string
+}
+
 export interface Feature {
   id: string
   title: string
   description: string
   criteria: string
   status: FeatureStatus
+  statusHistory: StatusHistoryEntry[]
+  createdAt: string
+  updatedAt: string
 }
 
 export interface Message {
