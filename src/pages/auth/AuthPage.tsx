@@ -4,11 +4,14 @@ import { login, signup } from '../../services/auth.service'
 import Input from '../../components/Input/Input'
 import Button from '../../components/Button/Button'
 import Card from '../../components/Card/Card'
+import Alert from '../../components/Alert/Alert'
+import { useToast } from '../../context/ToastContext'
 
 type Mode = 'login' | 'signup'
 
 export default function AuthPage() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [mode, setMode] = useState<Mode>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -22,15 +25,20 @@ export default function AuthPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    setError('')
     setLoading(true)
     try {
-      mode === 'login' ? await login(email, password) : await signup(email, password)
-      navigate('/dashboard')
+      if (mode === 'login') {
+        await login(email, password)
+        navigate('/dashboard')
+      } else {
+        await signup(email, password)
+        toast('Account created successfully! Welcome aboard.', 'success')
+        navigate('/dashboard')
+      }
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })
         ?.response?.data?.message
-      setError(msg || 'Something went wrong')
+      setError(msg || 'Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -60,12 +68,15 @@ export default function AuthPage() {
             ))}
           </div>
 
+          {/* Inline error — visible, inside the card */}
+          {error && <Alert message={error} variant="error" className="mb-4" />}
+
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
               label="Email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setError('') }}
               placeholder="you@example.com"
               required
             />
@@ -73,11 +84,10 @@ export default function AuthPage() {
               label="Password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); setError('') }}
               placeholder="••••••••"
               required
               minLength={6}
-              error={error || undefined}
             />
             <Button type="submit" loading={loading} fullWidth className="mt-2">
               {mode === 'login' ? 'Login' : 'Create Account'}

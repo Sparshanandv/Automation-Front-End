@@ -16,13 +16,15 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// On 401, try refresh once then redirect to login
+// On 401, try refresh once then redirect to login.
+// Skip auth endpoints — 401 there means wrong credentials, not expired token.
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config
+    const isAuthEndpoint = original.url?.startsWith('/auth/')
 
-    if (error.response?.status === 401 && !original._retry) {
+    if (error.response?.status === 401 && !original._retry && !isAuthEndpoint) {
       original._retry = true
       const refreshToken = token.getRefresh()
 
