@@ -1,5 +1,10 @@
-function App() {
-  return <h1>AI SDLC Automation</h1>
-}
+import { BrowserRouter } from 'react-router-dom'
+import AppRoutes from './routes'
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  )
+}
