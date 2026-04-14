@@ -48,7 +48,7 @@ export default function AddRepositoryModal({ isOpen, onClose, onSubmit }: AddRep
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
         <h2 className="text-xl font-bold mb-4">{createNew ? 'Create New Repository' : 'Link GitHub Repository'}</h2>
         
