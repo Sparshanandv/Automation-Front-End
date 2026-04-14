@@ -47,11 +47,26 @@ export default function RepositoryDetailsPage() {
         await fetchBranches()
     }
 
+    const handleDeleteBranch = async (branchName: string) => {
+        if (window.confirm(`Are you sure you want to delete the branch "${branchName}"?`)) {
+            try {
+                setLoading(true)
+                await api.delete(`/github/branches?repo_name=${repoName}&branch_name=${branchName}`)
+                toast(`Branch ${branchName} deleted successfully!`, 'success')
+                await fetchBranches()
+            } catch (err: any) {
+                toast(err.response?.data?.message || 'Failed to delete branch.', 'error')
+            } finally {
+                setLoading(false)
+            }
+        }
+    }
+
     return (
         <PageWrapper>
             <div className="max-w-4xl mx-auto py-12">
                 <div className="mb-8">
-                    <Link to="/dashboard" className="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center gap-2 mb-6 transition-colors">
+                    <Link to="/dashboard" replace className="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center gap-2 mb-6 transition-colors">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
@@ -89,25 +104,36 @@ export default function RepositoryDetailsPage() {
                         <Spinner />
                     </div>
                 ) : branches.length > 0 ? (
-                    <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-10 backdrop-blur-sm bg-white/90">
-                        <div className="max-w-xl">
-                            <label className="block text-xs font-black text-gray-400 mb-4 uppercase tracking-[0.2em]">
-                                Active Branch
+                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                        <div className="px-8 py-4 bg-gray-50 border-b border-gray-100">
+                            <label className="text-xs font-black text-gray-500 uppercase tracking-widest">
+                                Repository Branches
                             </label>
-                            <div className="relative group">
-                                <select className="w-full appearance-none px-6 py-5 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-bold text-gray-900 text-lg cursor-pointer group-hover:bg-white group-hover:shadow-lg">
-                                    {branches.map(branch => (
-                                        <option key={branch} value={branch}>{branch}</option>
-                                    ))}
-                                </select>
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-6 pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <p className="mt-4 text-sm text-gray-500 font-medium">
-                                Showing all <span className="text-indigo-600 font-bold">{branches.length}</span> branches available in this repository.
+                        </div>
+                        <ul className="divide-y divide-gray-100">
+                            {branches.map(branch => (
+                                <li key={branch} className="flex items-center justify-between px-8 py-4 hover:bg-gray-50 transition-colors group">
+                                    <div className="flex items-center gap-3">
+                                        <svg className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                        </svg>
+                                        <span className="font-semibold text-gray-700">{branch}</span>
+                                    </div>
+                                    <button
+                                        onClick={() => handleDeleteBranch(branch)}
+                                        className="text-gray-400 hover:text-red-500 transition-all p-2 hover:bg-red-50 rounded-lg focus:opacity-100"
+                                        title="Delete Branch"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                        <div className="px-8 py-4 bg-gray-50/50 border-t border-gray-100">
+                            <p className="text-sm text-gray-500">
+                                Total <span className="text-indigo-600 font-bold">{branches.length}</span> branches
                             </p>
                         </div>
                     </div>
