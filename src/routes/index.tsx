@@ -4,6 +4,7 @@ import PrivateLayout from '../layouts/PrivateLayout'
 import AuthPage from '../pages/auth/AuthPage'
 import DashboardPage from '../pages/dashboard/DashboardPage'
 import ProjectDetailPage from '../pages/dashboard/ProjectDetailPage'
+import RepositoryDetailsPage from '../pages/repository/RepositoryDetailsPage'
 
 export default function AppRoutes() {
   return (
@@ -17,6 +18,7 @@ export default function AppRoutes() {
       <Route element={<PrivateLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/projects/:id" element={<ProjectDetailPage />} />
+        <Route path="/repository/:owner/:repo" element={<RepositoryDetailsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" replace />} />
