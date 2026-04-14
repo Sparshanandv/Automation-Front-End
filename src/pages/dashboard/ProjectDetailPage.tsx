@@ -32,7 +32,7 @@ export default function ProjectDetailPage() {
     }
   }
 
-  const handleAddRepository = async (data: { repo_name: string; branch: string; purpose: string }) => {
+  const handleAddRepository = async (data: { repo_name: string; branch: string; purpose: string; createNew: boolean; description?: string; isPrivate?: boolean }) => {
     await api.post(`/projects/${id}/repos`, data)
     setIsModalOpen(false)
     fetchProject()
