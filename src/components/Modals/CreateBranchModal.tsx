@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Button from "../Button/Button";
 import Input from "../Input/Input";
+import Alert from "../Alert/Alert";
 
 interface CreateBranchModalProps {
   isOpen: boolean;
@@ -21,10 +22,10 @@ export default function CreateBranchModal({
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (branches.length > 0) {
+    if (branches.length > 0 && !fromBranch) {
       setFromBranch(branches[0]);
     }
-  }, [branches]);
+  }, [branches, fromBranch]);
 
   if (!isOpen) return null;
 
@@ -73,11 +74,7 @@ export default function CreateBranchModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
-              {error}
-            </div>
-          )}
+          {error && <Alert message={error} className="mb-2" />}
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -86,7 +83,7 @@ export default function CreateBranchModal({
             <select
               value={fromBranch}
               onChange={(e) => setFromBranch(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all outline-none text-sm"
             >
               {branches.map((branch) => (
                 <option key={branch} value={branch}>
@@ -94,7 +91,7 @@ export default function CreateBranchModal({
                 </option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-gray-400">
               Select the existing branch to create your new branch from.
             </p>
           </div>
@@ -120,7 +117,7 @@ export default function CreateBranchModal({
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              className="flex-1"
               loading={loading}
             >
               Create Branch

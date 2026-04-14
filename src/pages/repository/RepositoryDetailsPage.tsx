@@ -5,6 +5,8 @@ import PageWrapper from '../../components/PageWrapper/PageWrapper'
 import Alert from '../../components/Alert/Alert'
 import Spinner from '../../components/Spinner/Spinner'
 import CreateBranchModal from '../../components/Modals/CreateBranchModal'
+import Button from '../../components/Button/Button'
+import Card from '../../components/Card/Card'
 import { useToast } from '../../context/ToastContext'
 
 export default function RepositoryDetailsPage() {
@@ -64,89 +66,84 @@ export default function RepositoryDetailsPage() {
 
     return (
         <PageWrapper>
-            <div className="max-w-4xl mx-auto py-12">
+            <div className="max-w-4xl mx-auto py-8">
                 <div className="mb-8">
-                    <Link to="/dashboard" replace className="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center gap-2 mb-6 transition-colors">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        Back to Dashboard
+                    <Link to="/dashboard" className="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1 mb-6 transition-colors">
+                        &larr; Back to Dashboard
                     </Link>
 
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>
-                            <div className="flex items-center gap-3 text-gray-500 mb-2">
-                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" /></svg>
+                            <div className="flex items-center gap-2 text-gray-500 mb-2">
+                                <svg className="w-5 h-5 opacity-70" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" /></svg>
                                 <span className="font-medium">{owner}</span>
                             </div>
-                            <h1 className="text-4xl font-black text-gray-900 tracking-tight">
+                            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
                                 {repo}
                             </h1>
                         </div>
 
-                        <button
+                        <Button
                             onClick={() => setIsModalOpen(true)}
-                            disabled={loading || branches.length === 0}
-                            className="px-8 py-4 bg-indigo-600 text-white rounded-2xl shadow-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-3"
+                            disabled={loading}
                         >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                            </svg>
                             Create New Branch
-                        </button>
+                        </Button>
                     </div>
                 </div>
 
-                {error && <Alert message={error} />}
+                {error && <Alert message={error} className="mb-6" />}
 
                 {loading ? (
-                    <div className="flex justify-center items-center py-24">
+                    <div className="flex justify-center items-center py-12">
                         <Spinner />
                     </div>
                 ) : branches.length > 0 ? (
-                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                        <div className="px-8 py-4 bg-gray-50 border-b border-gray-100">
-                            <label className="text-xs font-black text-gray-500 uppercase tracking-widest">
+                    <Card padding="none" className="overflow-hidden">
+                        <div className="px-6 py-4 bg-gray-50 border-b border-gray-100">
+                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">
                                 Repository Branches
-                            </label>
+                            </h3>
                         </div>
                         <ul className="divide-y divide-gray-100">
                             {branches.map(branch => (
-                                <li key={branch} className="flex items-center justify-between px-8 py-4 hover:bg-gray-50 transition-colors group">
+                                <li key={branch} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors group">
                                     <div className="flex items-center gap-3">
-                                        <svg className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                                         </svg>
                                         <span className="font-semibold text-gray-700">{branch}</span>
                                     </div>
-                                    <button
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
                                         onClick={() => handleDeleteBranch(branch)}
-                                        className="text-gray-400 hover:text-red-500 transition-all p-2 hover:bg-red-50 rounded-lg focus:opacity-100"
+                                        className="text-gray-400 hover:text-red-600"
                                         title="Delete Branch"
                                     >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
-                                    </button>
+                                    </Button>
                                 </li>
                             ))}
                         </ul>
-                        <div className="px-8 py-4 bg-gray-50/50 border-t border-gray-100">
+                        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
                             <p className="text-sm text-gray-500">
-                                Total <span className="text-indigo-600 font-bold">{branches.length}</span> branches
+                                Total <span className="text-blue-600 font-bold">{branches.length}</span> branches
                             </p>
                         </div>
-                    </div>
+                    </Card>
                 ) : (
-                    <div className="text-center py-24 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400">
-                            <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <Card padding="lg" className="text-center bg-gray-50 border-dashed">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
                         </div>
-                        <p className="text-gray-500 text-xl font-bold">No branches found</p>
-                        <p className="text-gray-400 mt-2">Try refreshing or check your GitHub permissions.</p>
-                    </div>
+                        <p className="text-gray-500 text-lg font-bold">No branches found</p>
+                        <p className="text-gray-400 mt-1 text-sm">Try refreshing or check your GitHub permissions.</p>
+                    </Card>
                 )}
             </div>
 

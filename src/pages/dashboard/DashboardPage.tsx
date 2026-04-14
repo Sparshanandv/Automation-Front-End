@@ -5,6 +5,8 @@ import PageWrapper from '../../components/PageWrapper/PageWrapper'
 import Alert from '../../components/Alert/Alert'
 import Spinner from '../../components/Spinner/Spinner'
 import CreateProjectModal from '../../components/Modals/CreateProjectModal'
+import Button from '../../components/Button/Button'
+import Card from '../../components/Card/Card'
 import { Project } from '../../types/project'
 
 export default function DashboardPage() {
@@ -47,27 +49,21 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-bold text-gray-900">Your Projects</h2>
           <p className="text-sm text-gray-500 mt-1">Manage your active projects and repositories.</p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
-        >
+        <Button onClick={() => setIsModalOpen(true)}>
           + New Project
-        </button>
+        </Button>
       </div>
 
       {error && <Alert message={error} className="mb-6" />}
       {loading && <Spinner />}
 
       {!loading && !error && projects.length === 0 && (
-        <div className="text-center py-20 bg-gray-50 rounded-xl border border-gray-200 border-dashed">
+        <Card padding="lg" className="text-center border-dashed bg-gray-50">
           <p className="text-gray-500 mb-4">You don't have any projects yet.</p>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
-          >
+          <Button variant="secondary" onClick={() => setIsModalOpen(true)}>
             Create your first project
-          </button>
-        </div>
+          </Button>
+        </Card>
       )}
 
       {!loading && projects.length > 0 && (
@@ -76,15 +72,17 @@ export default function DashboardPage() {
             <Link
               key={project._id}
               to={`/projects/${project._id}`}
-              className="block bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow hover:border-blue-300"
+              className="block hover:shadow-md transition-shadow"
             >
-              <h3 className="text-lg font-semibold text-gray-900 truncate mb-2">{project.name}</h3>
-              <p className="text-sm text-gray-500 mb-4 line-clamp-2 min-h-10">
-                {project.description || 'No description provided.'}
-              </p>
-              <div className="flex justify-between items-center text-xs text-gray-400">
-                <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>
-              </div>
+              <Card className="h-full hover:border-blue-300 transition-colors">
+                <h3 className="text-lg font-semibold text-gray-900 truncate mb-2">{project.name}</h3>
+                <p className="text-sm text-gray-500 mb-4 line-clamp-2 min-h-10">
+                  {project.description || 'No description provided.'}
+                </p>
+                <div className="flex justify-between items-center text-xs text-gray-400">
+                  <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>
+                </div>
+              </Card>
             </Link>
           ))}
         </div>

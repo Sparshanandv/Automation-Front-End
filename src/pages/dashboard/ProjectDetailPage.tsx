@@ -6,6 +6,8 @@ import Alert from '../../components/Alert/Alert'
 import Spinner from '../../components/Spinner/Spinner'
 import Badge from '../../components/Badge/Badge'
 import AddRepositoryModal from '../../components/Modals/AddRepositoryModal'
+import Button from '../../components/Button/Button'
+import Card from '../../components/Card/Card'
 import { Project } from '../../types/project'
 
 export default function ProjectDetailPage() {
@@ -66,7 +68,7 @@ export default function ProjectDetailPage() {
   return (
     <PageWrapper>
       <div className="mb-6">
-        <Link to="/dashboard" replace className="text-sm text-blue-600 hover:underline mb-4 inline-block">
+        <Link to="/dashboard" className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 mb-4 transition-colors">
           &larr; Back to Dashboard
         </Link>
         <div className="flex justify-between items-start">
@@ -75,18 +77,12 @@ export default function ProjectDetailPage() {
             <p className="text-gray-500 mt-2 max-w-2xl">{project.description || 'No description provided.'}</p>
           </div>
           <div className="flex space-x-3">
-            <button
-              onClick={handleDeleteProject}
-              className="px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 hover:border-red-300 font-medium transition-colors"
-            >
+            <Button variant="danger" onClick={handleDeleteProject}>
               Delete Project
-            </button>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
-            >
+            </Button>
+            <Button onClick={() => setIsModalOpen(true)}>
               + Add Repository
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -95,15 +91,12 @@ export default function ProjectDetailPage() {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Repositories</h3>
 
         {(!project.repos || project.repos.length === 0) ? (
-          <div className="bg-gray-50 rounded-xl border border-gray-200 border-dashed p-10 text-center">
+          <Card padding="lg" className="text-center border-dashed bg-gray-50">
             <p className="text-gray-500 mb-4">No repositories linked to this project yet.</p>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="text-blue-600 font-medium hover:underline"
-            >
+            <Button variant="secondary" onClick={() => setIsModalOpen(true)}>
               Link a GitHub Repository
-            </button>
-          </div>
+            </Button>
+          </Card>
         ) : (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
@@ -139,12 +132,14 @@ export default function ProjectDetailPage() {
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleRemoveRepository(repo._id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 hover:text-red-900 hover:bg-red-50"
                       >
                         Remove
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}
