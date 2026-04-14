@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import api from '../../utils/axios'
 import PageWrapper from '../../components/PageWrapper/PageWrapper'
 import Alert from '../../components/Alert/Alert'
@@ -12,6 +13,8 @@ import { Project } from '../../types/project'
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
+  const [summary, setSummary] = useState<Summary | null>(null)
   const [error, setError] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -44,14 +47,22 @@ export default function DashboardPage() {
 
   return (
     <PageWrapper>
-      <div className="flex justify-between items-center mb-8">
-        <div>
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-8"></div>
+         <div>
           <h2 className="text-2xl font-bold text-gray-900">Your Projects</h2>
           <p className="text-sm text-gray-500 mt-1">Manage your active projects and repositories.</p>
         </div>
         <Button onClick={() => setIsModalOpen(true)}>
           + New Project
         </Button>
+        </div>
+        <button
+          onClick={() => navigate('/features')}
+          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+        >
+          Go to Task Board →
+        </button>
       </div>
 
       {error && <Alert message={error} className="mb-6" />}
