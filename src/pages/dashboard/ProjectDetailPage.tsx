@@ -93,7 +93,7 @@ export default function ProjectDetailPage() {
 
       <div className="mt-10">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Repositories</h3>
-        
+
         {(!project.repos || project.repos.length === 0) ? (
           <div className="bg-gray-50 rounded-xl border border-gray-200 border-dashed p-10 text-center">
             <p className="text-gray-500 mb-4">No repositories linked to this project yet.</p>
@@ -119,7 +119,12 @@ export default function ProjectDetailPage() {
                 {project.repos.map((repo) => (
                   <tr key={repo._id}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{repo.repo_name}</div>
+                      <Link
+                        to={`/repository/${repo.repo_name}`}
+                        className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                      >
+                        {repo.repo_name}
+                      </Link>
                       <div className="text-xs text-gray-500">Added {new Date(repo.createdAt).toLocaleDateString()}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -128,9 +133,9 @@ export default function ProjectDetailPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge 
-                        label={repo.purpose} 
-                        variant={repo.purpose === 'FE' ? 'success' : repo.purpose === 'BE' ? 'warning' : 'default'} 
+                      <Badge
+                        label={repo.purpose}
+                        variant={repo.purpose === 'FE' ? 'success' : repo.purpose === 'BE' ? 'warning' : 'neutral'}
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
