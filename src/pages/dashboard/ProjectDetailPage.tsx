@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import api from '../../utils/axios'
 import PageWrapper from '../../components/PageWrapper/PageWrapper'
 import Alert from '../../components/Alert/Alert'
@@ -10,6 +10,7 @@ import { Project } from '../../types/project'
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -48,6 +49,16 @@ export default function ProjectDetailPage() {
     }
   }
 
+  const handleDeleteProject = async () => {
+    if (!confirm('Are you sure you want to completely delete this project and detach all its repositories? This action cannot be undone.')) return
+    try {
+      await api.delete(`/projects/${id}`)
+      navigate('/dashboard')
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete project')
+    }
+  }
+
   if (loading) return <PageWrapper><Spinner /></PageWrapper>
   if (error) return <PageWrapper><Alert message={error} /></PageWrapper>
   if (!project) return <PageWrapper><Alert message="Project not found" /></PageWrapper>
@@ -63,12 +74,20 @@ export default function ProjectDetailPage() {
             <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
             <p className="text-gray-500 mt-2 max-w-2xl">{project.description || 'No description provided.'}</p>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
-          >
-            + Add Repository
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={handleDeleteProject}
+              className="px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 hover:border-red-300 font-medium transition-colors"
+            >
+              Delete Project
+            </button>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+            >
+              + Add Repository
+            </button>
+          </div>
         </div>
       </div>
 
