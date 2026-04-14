@@ -14,7 +14,6 @@ export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
-  const [summary, setSummary] = useState<Summary | null>(null)
   const [error, setError] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
