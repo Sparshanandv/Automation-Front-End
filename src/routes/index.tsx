@@ -3,6 +3,8 @@ import PublicLayout from '../layouts/PublicLayout'
 import PrivateLayout from '../layouts/PrivateLayout'
 import AuthPage from '../pages/auth/AuthPage'
 import DashboardPage from '../pages/dashboard/DashboardPage'
+import FeaturesPage from '../pages/features/FeaturesPage'
+import FeatureDetailPage from '../pages/features/FeatureDetailPage'
 
 export default function AppRoutes() {
   return (
@@ -14,7 +16,9 @@ export default function AppRoutes() {
 
       {/* Private routes — redirect to /login if not authenticated */}
       <Route element={<PrivateLayout />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard"       element={<DashboardPage />} />
+        <Route path="/features"        element={<FeaturesPage />} />
+        <Route path="/features/:id"    element={<FeatureDetailPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" replace />} />

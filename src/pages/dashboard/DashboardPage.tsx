@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import api from '../../utils/axios'
 import PageWrapper from '../../components/PageWrapper/PageWrapper'
 import Alert from '../../components/Alert/Alert'
@@ -17,6 +18,7 @@ interface Summary {
 }
 
 export default function DashboardPage() {
+  const navigate = useNavigate()
   const [summary, setSummary] = useState<Summary | null>(null)
   const [error, setError] = useState('')
 
@@ -29,6 +31,15 @@ export default function DashboardPage() {
 
   return (
     <PageWrapper>
+      <div className="mb-6">
+        <button
+          onClick={() => navigate('/features')}
+          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+        >
+          Go to Task Board →
+        </button>
+      </div>
+
       {error && <Alert message={error} className="mb-6" />}
       {!summary && !error && <Spinner />}
 

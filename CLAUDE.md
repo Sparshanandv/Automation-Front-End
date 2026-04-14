@@ -130,6 +130,17 @@ src/
 
 ---
 
+## WHEN PROJECT MODULE IS ADDED
+
+The task board currently shows all features globally. When the project module is built:
+
+1. **FeaturesPage.tsx** — add a project selector dropdown at the top; call `featureService.listByProject(projectId)` instead of `listAll()`
+2. **CreateFeatureModal.tsx** — add a project dropdown field; pass `projectId` to `featureService.create()`
+3. **feature.service.ts** — add `listByProject(projectId)` calling `GET /features?projectId=`
+4. **types/index.ts** — `projectId` is already optional on `Feature`, just needs to be populated
+
+---
+
 ## PAGES
 
 ### /login
