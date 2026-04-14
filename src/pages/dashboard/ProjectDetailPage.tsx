@@ -66,7 +66,7 @@ export default function ProjectDetailPage() {
   return (
     <PageWrapper>
       <div className="mb-6">
-        <Link to="/dashboard" className="text-sm text-blue-600 hover:underline mb-4 inline-block">
+        <Link to="/dashboard" replace className="text-sm text-blue-600 hover:underline mb-4 inline-block">
           &larr; Back to Dashboard
         </Link>
         <div className="flex justify-between items-start">

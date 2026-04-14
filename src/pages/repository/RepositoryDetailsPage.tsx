@@ -104,36 +104,38 @@ export default function RepositoryDetailsPage() {
                         <Spinner />
                     </div>
                 ) : branches.length > 0 ? (
-                    <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-10 backdrop-blur-sm bg-white/90">
-                        <label className="block text-xs font-black text-gray-400 mb-6 uppercase tracking-[0.2em]">
-                            Repository Branches
-                        </label>
-                        <div className="space-y-4">
+                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                        <div className="px-8 py-4 bg-gray-50 border-b border-gray-100">
+                            <label className="text-xs font-black text-gray-500 uppercase tracking-widest">
+                                Repository Branches
+                            </label>
+                        </div>
+                        <ul className="divide-y divide-gray-100">
                             {branches.map(branch => (
-                                <div key={branch} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 group hover:bg-white hover:shadow-md transition-all">
+                                <li key={branch} className="flex items-center justify-between px-8 py-4 hover:bg-gray-50 transition-colors group">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                                            </svg>
-                                        </div>
-                                        <span className="font-bold text-gray-900">{branch}</span>
+                                        <svg className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                        </svg>
+                                        <span className="font-semibold text-gray-700">{branch}</span>
                                     </div>
                                     <button
                                         onClick={() => handleDeleteBranch(branch)}
-                                        className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg"
+                                        className="text-gray-400 hover:text-red-500 transition-all p-2 hover:bg-red-50 rounded-lg focus:opacity-100"
                                         title="Delete Branch"
                                     >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
                                     </button>
-                                </div>
+                                </li>
                             ))}
+                        </ul>
+                        <div className="px-8 py-4 bg-gray-50/50 border-t border-gray-100">
+                            <p className="text-sm text-gray-500">
+                                Total <span className="text-indigo-600 font-bold">{branches.length}</span> branches
+                            </p>
                         </div>
-                        <p className="mt-8 text-sm text-gray-500 font-medium">
-                            Showing all <span className="text-indigo-600 font-bold">{branches.length}</span> branches available in this repository.
-                        </p>
                     </div>
                 ) : (
                     <div className="text-center py-24 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
