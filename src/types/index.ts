@@ -53,3 +53,16 @@ export interface Message {
   message: string
   createdAt: string
 }
+
+export interface TestCase {
+  id: string
+  feature_id: string
+  content: any
+}
+
+export interface Plan {
+  id: string
+  feature_id: string
+  content: string
+  refinements: string[]
+}
