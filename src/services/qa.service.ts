@@ -1,5 +1,5 @@
 import api from '../utils/axios'
-import { QAGenerationResponse } from '../types'
+import { QAGenerationResponse, Feature } from '../types'
 
 export const qaService = {
   async generateTestCases(featureId: string): Promise<QAGenerationResponse> {
@@ -19,7 +19,8 @@ export const qaService = {
     return res.data
   },
 
-  async approveTestCases(featureId: string): Promise<void> {
-    await api.post(`/ai/qa/approve/${featureId}`)
+  async approveTestCases(featureId: string): Promise<Feature> {
+    const res = await api.post<Feature>(`/ai/qa/approve/${featureId}`)
+    return res.data
   }
 }

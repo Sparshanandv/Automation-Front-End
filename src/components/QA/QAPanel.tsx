@@ -44,7 +44,6 @@ export default function QAPanel({ featureId, onApproved, initialTestCases = [], 
   const [error, setError] = useState('')
   const [prompt, setPrompt] = useState('')
   const [showPromptInput, setShowPromptInput] = useState(false)
-  console.log('mappedTestCases0----->>>')
 
   async function handleGenerate(customPrompt?: string) {
     setLoading(true)
@@ -82,8 +81,8 @@ export default function QAPanel({ featureId, onApproved, initialTestCases = [], 
     setLoading(true)
     setError('')
     try {
-      await qaService.approveTestCases(featureId)
-      if (onApproved) onApproved()
+      const updatedFeature = await qaService.approveTestCases(featureId)
+      if (onApproved && updatedFeature) onApproved()
     } catch (err) {
       setError('Failed to approve test cases. Please try again.')
     } finally {

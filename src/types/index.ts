@@ -38,11 +38,13 @@ export interface StatusHistoryEntry {
 
 export interface Feature {
   id: string
+  featureKey: string
   title: string
   description: string
   criteria: string
   status: FeatureStatus
   statusHistory: StatusHistoryEntry[]
+  projectId: string | null
   createdAt: string
   updatedAt: string
 }
@@ -70,13 +72,6 @@ export interface QAGenerationResponse {
   createdAt: string
   updatedAt: string
 }
-
-// export interface TestCase {
-//   id: string
-//   feature_id: string
-//   content: any
-// }
-
 export interface Plan {
   id: string
   feature_id: string
