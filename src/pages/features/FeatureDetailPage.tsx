@@ -7,6 +7,7 @@ import { STATUS_ORDER, STATUS_LABELS, getNextStatus } from '../../utils/statusUt
 import Spinner from '../../components/Spinner/Spinner'
 import Alert from '../../components/Alert/Alert'
 import QAPanel from '../../components/QA/QAPanel'
+import DevPlanGenerator from '../../components/features/DevPlanGenerator'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString('en-US', {
@@ -201,12 +202,21 @@ export default function FeatureDetailPage() {
                   onApproved={handleAdvance} 
                   initialTestCases={testCases}
                   onTestCasesChange={setTestCases}
+                  />
+                  </div>
+                  )}
+            {/* AI Dev Plan Generation Module */}
+            {feature.status === 'DEV' && (
+              <div className="mb-4">
+                <DevPlanGenerator 
+                  feature={feature} 
+                  onStatusUpdated={(updated) => setFeature(updated)} 
                 />
               </div>
             )}
 
             {/* Advance button */}
-            {getNextStatus(feature.status) && feature.status !== 'QA' && (
+            {getNextStatus(feature.status) && feature.status !== 'QA' && feature.status !== 'DEV' && (
               <button
                 onClick={handleAdvance}
                 disabled={advancing}

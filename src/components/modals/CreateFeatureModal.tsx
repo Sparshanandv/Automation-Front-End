@@ -5,9 +5,10 @@ import { featureService } from '../../services/feature.service'
 interface Props {
   onClose: () => void
   onCreate: (feature: Feature) => void
+  projectId?: string
 }
 
-export default function CreateFeatureModal({ onClose, onCreate }: Props) {
+export default function CreateFeatureModal({ onClose, onCreate, projectId }: Props) {
   const [title, setTitle]           = useState('')
   const [description, setDescription] = useState('')
   const [criteria, setCriteria]     = useState('')
@@ -23,7 +24,7 @@ export default function CreateFeatureModal({ onClose, onCreate }: Props) {
     }
     setLoading(true)
     try {
-      const feature = await featureService.create(title.trim(), description.trim(), criteria.trim())
+      const feature = await featureService.create(title.trim(), description.trim(), criteria.trim(), projectId)
       onCreate(feature)
       onClose()
     } catch {

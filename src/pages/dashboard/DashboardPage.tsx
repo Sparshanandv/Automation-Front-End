@@ -1,76 +1,100 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import api from '../../utils/axios'
 import PageWrapper from '../../components/PageWrapper/PageWrapper'
 import Alert from '../../components/Alert/Alert'
 import Spinner from '../../components/Spinner/Spinner'
-import Badge from '../../components/Badge/Badge'
-
-interface Feature {
-  name: string
-  status: string
-}
-
-interface Summary {
-  message: string
-  user: { sub: string; email: string }
-  features: Feature[]
-}
+import CreateProjectModal from '../../components/Modals/CreateProjectModal'
+import Button from '../../components/Button/Button'
+import Card from '../../components/Card/Card'
+import { Project } from '../../types/project'
 
 export default function DashboardPage() {
-  const navigate = useNavigate()
-  const [summary, setSummary] = useState<Summary | null>(null)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
-    api
-      .get<Summary>('/demo/summary')
-      .then((res) => setSummary(res.data))
-      .catch(() => setError('Failed to load summary'))
+    fetchProjects()
   }, [])
+
+  const fetchProjects = async () => {
+    try {
+      setLoading(true)
+      const res = await api.get<Project[]>('/projects')
+      setProjects(res.data)
+      setError('')
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to load projects')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCreateProject = async (data: { name: string; description: string }) => {
+    try {
+      await api.post('/projects', data)
+      setIsModalOpen(false)
+      fetchProjects()
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to create project')
+    }
+  }
 
   return (
     <PageWrapper>
       <div className="mb-6">
-        <button
-          onClick={() => navigate('/features')}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-        >
-          Go to Task Board →
-        </button>
+        <div className="flex justify-between items-center mb-8">
+         <div>
+          <h2 className="text-2xl font-bold text-gray-900">Your Projects</h2>
+          <p className="text-sm text-gray-500 mt-1">Manage your active projects and repositories.</p>
+        </div>
+        <Button onClick={() => setIsModalOpen(true)}>
+          + New Project
+        </Button>
+        </div>
       </div>
 
       {error && <Alert message={error} className="mb-6" />}
-      {!summary && !error && <Spinner />}
+      {loading && <Spinner />}
 
-      {summary && (
-        <>
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-gray-900">
-              Welcome back, <span className="text-blue-600">{summary.user.email}</span>
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">{summary.message}</p>
-          </div>
-
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">
-            Platform Features
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {summary.features.map((f) => (
-              <div
-                key={f.name}
-                className="bg-white rounded-xl border border-gray-200 p-5 flex items-center justify-between"
-              >
-                <span className="text-sm font-medium text-gray-800">{f.name}</span>
-                <Badge
-                  label={f.status}
-                  variant={f.status === 'available' ? 'success' : 'warning'}
-                />
-              </div>
-            ))}
-          </div>
-        </>
+      {!loading && !error && projects.length === 0 && (
+        <Card padding="lg" className="text-center border-dashed bg-gray-50">
+          <p className="text-gray-500 mb-4">You don't have any projects yet.</p>
+          <Button variant="secondary" onClick={() => setIsModalOpen(true)}>
+            Create your first project
+          </Button>
+        </Card>
       )}
+
+      {!loading && projects.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project) => (
+            <Link
+              key={project._id}
+              to={`/projects/${project._id}`}
+              className="block hover:shadow-md transition-shadow"
+            >
+              <Card className="h-full hover:border-blue-300 transition-colors">
+                <h3 className="text-lg font-semibold text-gray-900 truncate mb-2">{project.name}</h3>
+                <p className="text-sm text-gray-500 mb-4 line-clamp-2 min-h-10">
+                  {project.description || 'No description provided.'}
+                </p>
+                <div className="flex justify-between items-center text-xs text-gray-400">
+                  <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <CreateProjectModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateProject}
+      />
     </PageWrapper>
   )
 }
