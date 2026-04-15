@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Feature, TestCase, Plan } from '../../types'
+import { useState, useEffect } from 'react'
+import { Feature, TestCase } from '../../types'
 import { aiService } from '../../services/ai.service'
 import { featureService } from '../../services/feature.service'
 import Button from '../Button/Button'
@@ -16,7 +16,7 @@ interface DevPlanGeneratorProps {
 
 export default function DevPlanGenerator({ feature, onStatusUpdated }: DevPlanGeneratorProps) {
   const [testCase, setTestCase] = useState<TestCase | null>(null)
-  const [plan, setPlan] = useState<Plan | null>(null)
+  const [plan, setPlan] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState('')
@@ -36,7 +36,7 @@ export default function DevPlanGenerator({ feature, onStatusUpdated }: DevPlanGe
         aiService.getPlan(feature.id).catch(() => null)
       ])
       setTestCase(tc)
-      setPlan(p)
+      setPlan(p?.plan || null)
     } catch (err) {
       setError('Failed to fetch development data')
     } finally {
@@ -48,8 +48,13 @@ export default function DevPlanGenerator({ feature, onStatusUpdated }: DevPlanGe
     setGenerating(true)
     setError('')
     try {
-      const result = await aiService.generatePlan(feature.id, withRefinement ? refinement : undefined)
-      setPlan(result)
+      const body = {
+        userStory: feature.description,
+        testCases: testCase?.content || [],
+        optionalPrompt: withRefinement ? refinement : undefined
+      }
+      const result = await aiService.generatePlan(feature.id, body)
+      setPlan(result.plan)
       if (withRefinement) setRefinement('')
     } catch (err) {
       setError('Failed to generate plan. Please try again.')
@@ -116,11 +121,11 @@ export default function DevPlanGenerator({ feature, onStatusUpdated }: DevPlanGe
 
             {plan ? (
               <div className="prose prose-sm max-w-none bg-white p-6 rounded-xl border border-blue-100 shadow-sm min-h-[200px] whitespace-pre-wrap font-sans text-gray-800">
-                {plan.content}
+                {plan}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                <Spinner size="md" className={generating ? 'mb-4' : 'hidden'} />
+                {generating && <div className="mb-4"><Spinner size="md" /></div>}
                 <p className="text-sm text-gray-500 mb-4">{generating ? 'Consulting the AI architect...' : 'No plan generated yet.'}</p>
                 {!generating && (
                   <Button variant="primary" size="md" onClick={() => handleGenerate()}>

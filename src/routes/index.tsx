@@ -21,7 +21,6 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/projects/:id" element={<ProjectDetailPage />} />
         <Route path="/repository/:owner/:repo" element={<RepositoryDetailsPage />} />
-        <Route path="/dashboard"       element={<DashboardPage />} />
         <Route path="/features"        element={<FeaturesPage />} />
         <Route path="/features/:id"    element={<FeatureDetailPage />} />
       </Route>

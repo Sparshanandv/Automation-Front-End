@@ -85,3 +85,16 @@ export interface Plan {
   createdAt: string
   updatedAt: string
 }
+
+export interface PlanApiResponse {
+  plan: string
+}
+
+export interface CodeGenerationResponse {
+  featureId: string
+  sessionId: string
+  result: {
+    filesWritten: string[]
+    summary: string
+  }
+}

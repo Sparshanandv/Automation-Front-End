@@ -42,6 +42,10 @@ export default function FeatureDetailPage() {
   const [generating, setGenerating] = useState(false)
   const [planAction, setPlanAction] = useState<'approving' | 'rejecting' | null>(null)
 
+  // Code generation state
+  const [codeGenerating, setCodeGenerating] = useState(false)
+  const [codeGenResult, setCodeGenResult] = useState<{ filesWritten: string[]; summary: string } | null>(null)
+
   const fetchFeatureDetails = () => {
     if (!id) return
     featureService.getById(id)
@@ -85,7 +89,7 @@ export default function FeatureDetailPage() {
       setPlanLoading(true)
       setPlanError('')
       aiService.getPlan(id)
-        .then(p => setPlan(p.content))
+        .then(p => setPlan(p.plan))
         .catch((error) => {
           setPlan(null)
           if (error.response?.status === 404) {
@@ -139,7 +143,9 @@ export default function FeatureDetailPage() {
         testCases: [],
         optionalPrompt: optionalPrompt.trim() || undefined,
       })
-      setPlan(result.content)
+      
+      setPlan(result.plan)
+      console.log('result.content________________',result)
       const updated = await featureService.getById(id)
       setFeature(updated)
       setShowGenForm(false)
@@ -179,6 +185,24 @@ export default function FeatureDetailPage() {
     }
   }
 
+  async function handleGenerateCode() {
+    if (!id) return
+    setCodeGenerating(true)
+    setError('')
+    setCodeGenResult(null)
+    try {
+      const result = await aiService.executeCodeGeneration(id)
+      setCodeGenResult(result.result)
+      // Refresh feature to get updated status
+      const updated = await featureService.getById(id)
+      setFeature(updated)
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to generate code')
+    } finally {
+      setCodeGenerating(false)
+    }
+  }
+
   const currentIndex = feature ? STATUS_ORDER.indexOf(feature.status) : -1
   const nextStatus = feature ? getNextStatus(feature.status) : null
 
@@ -187,7 +211,7 @@ export default function FeatureDetailPage() {
   const isDev = feature?.status === 'DEV'
   const isPlanApproved = feature?.status === 'PLAN_APPROVED'
   const canRegeneratePlan = isDev && !plan && !planLoading
-  const showRegularAdvance = nextStatus && !isQaApproved && !isDev && feature?.status !== 'QA'
+  const showRegularAdvance = nextStatus && !isQaApproved && !isDev && !isPlanApproved && feature?.status !== 'QA'
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -416,6 +440,76 @@ export default function FeatureDetailPage() {
                     >
                       {planAction === 'rejecting' ? 'Rejecting…' : 'Reject & Regenerate'}
                     </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Code Generation Section - shown when PLAN_APPROVED */}
+            {isPlanApproved && (
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Code Generation</p>
+                  {codeGenResult && (
+                    <span className="text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                      ✓ Complete
+                    </span>
+                  )}
+                </div>
+
+                {!codeGenResult && (
+                  <div className="text-center py-8">
+                    <div className="mb-4">
+                      <svg className="w-16 h-16 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Ready to Generate Code</h3>
+                    <p className="text-sm text-gray-500 mb-6 max-w-md mx-auto">
+                      The development plan has been approved. Click below to start AI-powered code generation based on the plan.
+                    </p>
+                    <button
+                      onClick={handleGenerateCode}
+                      disabled={codeGenerating}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-xl transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+                    >
+                      {codeGenerating ? (
+                        <>
+                          <Spinner />
+                          <span>Generating Code...</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                          <span>Generate Code</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+
+                {codeGenResult && (
+                  <div className="space-y-4">
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                      <h4 className="text-sm font-semibold text-green-800 mb-2">Summary</h4>
+                      <p className="text-sm text-green-700">{codeGenResult.summary}</p>
+                    </div>
+
+                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2">Files Written ({codeGenResult.filesWritten.length})</h4>
+                      <ul className="space-y-1">
+                        {codeGenResult.filesWritten.map((file, idx) => (
+                          <li key={idx} className="text-xs text-gray-600 font-mono flex items-center gap-2">
+                            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {file}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 )}
               </div>
