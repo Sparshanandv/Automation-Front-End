@@ -56,6 +56,23 @@ export interface Message {
 
 export interface TestCase {
   id: string
+  title: string
+  steps: string[]
+  expected: string
+  type: string
+  status?: 'pending' | 'approved' | 'rejected'
+}
+
+export interface QAGenerationResponse {
+  _id: string
+  feature_id: string
+  content: TestCase[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface TestCase {
+  id: string
   feature_id: string
   content: any
 }

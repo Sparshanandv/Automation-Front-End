@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Feature, FeatureStatus, StatusHistoryEntry } from '../../types'
+import { Feature, FeatureStatus, StatusHistoryEntry, TestCase } from '../../types'
 import { featureService } from '../../services/feature.service'
+import { qaService } from '../../services/qa.service'
 import { STATUS_ORDER, STATUS_LABELS, getNextStatus } from '../../utils/statusUtils'
 import Spinner from '../../components/Spinner/Spinner'
 import Alert from '../../components/Alert/Alert'
+import QAPanel from '../../components/QA/QAPanel'
 import DevPlanGenerator from '../../components/features/DevPlanGenerator'
 
 function formatDate(iso: string) {
@@ -22,25 +24,64 @@ export default function FeatureDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState('')
   const [advancing, setAdvancing] = useState(false)
+  const [testCases, setTestCases] = useState<TestCase[]>([])
 
-  useEffect(() => {
-    if (!id) return
+  const fetchFeatureDetails = () =>{
     featureService.getById(id)
       .then(setFeature)
       .catch(() => setError('Failed to load task'))
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    if (!id) return
+    fetchFeatureDetails()
+    
+    // Load test cases from localStorage
+    const saved = localStorage.getItem(`test-cases-${id}`)
+    if (saved) {
+      try {
+        setTestCases(JSON.parse(saved))
+      } catch (e) {
+        console.error('Failed to parse saved test cases', e)
+        setTestCases([])
+      }
+    } else {
+      setTestCases([])
+    }
   }, [id])
+
+  useEffect(() => {
+    // Only save if we have test cases AND they were loaded for the current ID
+    // We check if it's not empty, but we also need to be sure it's not the old feature's data.
+    // By resetting to [] when ID changes (see above), we avoid most issues.
+    if (id && testCases.length > 0) {
+      localStorage.setItem(`test-cases-${id}`, JSON.stringify(testCases))
+    }
+  }, [id, testCases])
 
   async function handleAdvance() {
     if (!feature) return
     const next = getNextStatus(feature.status)
     if (!next) return
     setAdvancing(true)
+    setError('')
     try {
-      const updated = await featureService.updateStatus(feature.id, next)
-      setFeature(updated)
-    } catch {
-      setError('Failed to update status')
+      if (feature.status === 'CREATED') {
+        const data = await qaService.generateTestCases(feature.id)
+        
+        const mappedTestCases = data.content.map(tc => ({
+          ...tc,
+          status: tc.status || ('pending' as const)
+        }))
+        setTestCases(mappedTestCases)
+      fetchFeatureDetails();
+      }else{
+        const updated = await featureService.updateStatus(feature.id, next)
+        setFeature(updated)
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Failed to update status')
     } finally {
       setAdvancing(false)
     }
@@ -153,6 +194,17 @@ export default function FeatureDetailPage() {
               </div>
             )}
 
+            {/* QA Section */}
+            {feature.status === 'QA' && (
+              <div className="mb-8">
+                <QAPanel 
+                  featureId={feature.id} 
+                  onApproved={handleAdvance} 
+                  initialTestCases={testCases}
+                  onTestCasesChange={setTestCases}
+                  />
+                  </div>
+                  )}
             {/* AI Dev Plan Generation Module */}
             {feature.status === 'DEV' && (
               <div className="mb-4">
@@ -164,15 +216,17 @@ export default function FeatureDetailPage() {
             )}
 
             {/* Advance button */}
-            {getNextStatus(feature.status) && feature.status !== 'DEV' && (
+            {getNextStatus(feature.status) && feature.status !== 'QA' && feature.status !== 'DEV' && (
               <button
                 onClick={handleAdvance}
                 disabled={advancing}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-colors disabled:opacity-50"
               >
                 {advancing
-                   ? 'Advancing…'
-                   : `Advance to ${STATUS_LABELS[getNextStatus(feature.status) as FeatureStatus]}`}
+                  ? 'Advancing…'
+                  : feature.status === 'CREATED'
+                    ? 'Generate Test Cases'
+                    : `Advance to ${STATUS_LABELS[getNextStatus(feature.status) as FeatureStatus]}`}
               </button>
             )}
 
