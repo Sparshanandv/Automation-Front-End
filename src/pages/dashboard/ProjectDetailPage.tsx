@@ -88,7 +88,15 @@ export default function ProjectDetailPage() {
       </div>
 
       <div className="mt-10">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Repositories</h3>
+        <div className="flex items-center gap-4 mb-4 justify-between">
+          <h3 className="text-lg font-semibold text-gray-900">Repositories</h3>
+          <button
+            onClick={() => navigate(`/features?projectId=${id}`)}
+            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors cursor-pointer"
+          >
+            Go to Task Board →
+          </button>
+        </div>
 
         {(!project.repos || project.repos.length === 0) ? (
           <Card padding="lg" className="text-center border-dashed bg-gray-50">
