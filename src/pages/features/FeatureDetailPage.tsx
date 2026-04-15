@@ -43,6 +43,7 @@ export default function FeatureDetailPage() {
   const [planAction, setPlanAction] = useState<'approving' | 'rejecting' | null>(null)
 
   const fetchFeatureDetails = () => {
+    if (!id) return
     featureService.getById(id)
       .then(f => {
         setFeature(f)
