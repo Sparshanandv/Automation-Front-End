@@ -5,6 +5,7 @@ import { featureService } from '../../services/feature.service'
 import { STATUS_ORDER, STATUS_LABELS, getNextStatus } from '../../utils/statusUtils'
 import Spinner from '../../components/Spinner/Spinner'
 import Alert from '../../components/Alert/Alert'
+import DevPlanGenerator from '../../components/features/DevPlanGenerator'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString('en-US', {
@@ -152,16 +153,26 @@ export default function FeatureDetailPage() {
               </div>
             )}
 
+            {/* AI Dev Plan Generation Module */}
+            {feature.status === 'DEV' && (
+              <div className="mb-4">
+                <DevPlanGenerator 
+                  feature={feature} 
+                  onStatusUpdated={(updated) => setFeature(updated)} 
+                />
+              </div>
+            )}
+
             {/* Advance button */}
-            {getNextStatus(feature.status) && (
+            {getNextStatus(feature.status) && feature.status !== 'DEV' && (
               <button
                 onClick={handleAdvance}
                 disabled={advancing}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-colors disabled:opacity-50"
               >
                 {advancing
-                  ? 'Advancing…'
-                  : `Advance to ${STATUS_LABELS[getNextStatus(feature.status) as FeatureStatus]}`}
+                   ? 'Advancing…'
+                   : `Advance to ${STATUS_LABELS[getNextStatus(feature.status) as FeatureStatus]}`}
               </button>
             )}
 
