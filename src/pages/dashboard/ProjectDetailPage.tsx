@@ -18,6 +18,8 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [unlinkingRepoId, setUnlinkingRepoId] = useState<string | null>(null)
+  const [unlinkError, setUnlinkError] = useState('')
 
   useEffect(() => {
     fetchProject()
@@ -42,13 +44,15 @@ export default function ProjectDetailPage() {
     fetchProject()
   }
 
-  const handleRemoveRepository = async (repoId: string) => {
-    if (!confirm('Are you sure you want to remove this repository?')) return
+  const handleUnlinkRepository = async (repoId: string) => {
     try {
+      setUnlinkError('')
       await api.delete(`/projects/${id}/repos/${repoId}`)
+      setUnlinkingRepoId(null)
       fetchProject()
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to remove repository')
+      setUnlinkError(err.response?.data?.message || 'Failed to unlink repository')
+      setUnlinkingRepoId(null)
     }
   }
 
@@ -74,7 +78,7 @@ export default function ProjectDetailPage() {
         </Link>
         <div className="flex justify-between items-start">
           <div className="flex-1 mr-8 min-w-0">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 max-w-[50vw]">
               <h1 className="text-3xl font-bold text-gray-900 break-words line-clamp-2">{project.name}</h1>
               {project.projectKey && (
                 <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded tracking-wider mt-1 shrink-0">
@@ -96,6 +100,8 @@ export default function ProjectDetailPage() {
           </div>
         </div>
       </div>
+
+      {unlinkError && <Alert message={unlinkError} variant="error" className="mt-4" />}
 
       <div className="mt-10">
         <div className="flex items-center gap-4 mb-4 justify-between">
@@ -150,14 +156,34 @@ export default function ProjectDetailPage() {
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveRepository(repo._id)}
-                        className="text-red-600 hover:text-red-900 hover:bg-red-50"
-                      >
-                        Remove
-                      </Button>
+                      {unlinkingRepoId === repo._id ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-xs text-gray-500">Unlink this repo?</span>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleUnlinkRepository(repo._id)}
+                          >
+                            Yes, unlink
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setUnlinkingRepoId(null)}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => { setUnlinkError(''); setUnlinkingRepoId(repo._id) }}
+                          className="text-red-600 hover:text-red-900 hover:bg-red-50"
+                        >
+                          Unlink
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -170,6 +196,7 @@ export default function ProjectDetailPage() {
       <AddRepositoryModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        projectId={project._id}
         onSubmit={handleAddRepository}
       />
     </PageWrapper>

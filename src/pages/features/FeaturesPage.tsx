@@ -20,6 +20,7 @@ export default function FeaturesPage() {
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [projectKey, setProjectKey] = useState("");
+  const [featureToEdit, setFeatureToEdit] = useState<Feature | undefined>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,6 +51,20 @@ export default function FeaturesPage() {
 
   function handleUpdate(updated: Feature) {
     setFeatures((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+  }
+
+  function handleDelete(id: string) {
+    setFeatures((prev) => prev.filter((f) => f.id !== id));
+  }
+
+  function handleOpenEditModal(feature: Feature) {
+    setFeatureToEdit(feature);
+    setShowModal(true);
+  }
+
+  function handleCloseModal() {
+    setShowModal(false);
+    setFeatureToEdit(undefined);
   }
 
   return (
@@ -89,7 +104,10 @@ export default function FeaturesPage() {
           </div>
         </div>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={() => {
+            setFeatureToEdit(undefined);
+            setShowModal(true);
+          }}
           className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors cursor-pointer"
         >
           + New Task
@@ -101,15 +119,22 @@ export default function FeaturesPage() {
         {loading && <Spinner />}
         {error && <Alert message={error} />}
         {!loading && !error && (
-          <KanbanBoard features={features} onUpdate={handleUpdate} />
+          <KanbanBoard
+            features={features}
+            onUpdate={handleUpdate}
+            onDelete={handleDelete}
+            onEdit={handleOpenEditModal}
+          />
         )}
       </div>
 
       {showModal && (
         <CreateFeatureModal
-          onClose={() => setShowModal(false)}
-          onCreate={handleCreate}
+          onClose={handleCloseModal}
+          onCreate={featureToEdit ? undefined : handleCreate}
+          onUpdate={featureToEdit ? handleUpdate : undefined}
           projectId={projectId}
+          featureToEdit={featureToEdit}
         />
       )}
     </div>

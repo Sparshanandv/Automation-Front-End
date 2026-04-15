@@ -14,6 +14,7 @@ export interface Project {
   description?: string
   userId: string
   projectKey?: string
+  createdByEmail?: string
   repos?: Repository[]
   createdAt: string
   updatedAt: string
