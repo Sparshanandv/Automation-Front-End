@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 
 interface DescriptionDisplayProps {
     content: string;
@@ -25,6 +26,8 @@ const DescriptionDisplay: React.FC<DescriptionDisplayProps> = ({
         }
     }, [content, maxHeight, showReadMore]);
 
+    const sanitizedContent = DOMPurify.sanitize(content);
+
     const truncateStyle: React.CSSProperties = !showReadMore ? {
         display: '-webkit-box',
         WebkitLineClamp: lineLimit,
@@ -40,7 +43,7 @@ const DescriptionDisplay: React.FC<DescriptionDisplayProps> = ({
             <div
                 ref={contentRef}
                 className={`prose prose-sm max-w-none text-gray-600 overflow-hidden break-words transition-all duration-300`}
-                dangerouslySetInnerHTML={{ __html: content }}
+                dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                 style={truncateStyle}
             />
 
