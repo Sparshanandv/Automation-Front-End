@@ -47,6 +47,7 @@ export interface Feature {
   status: FeatureStatus
   createdBy: { id: string; email: string }
   statusHistory: StatusHistoryEntry[]
+  projectId: string | null
   createdAt: string
   updatedAt: string
 }
@@ -74,13 +75,6 @@ export interface QAGenerationResponse {
   createdAt: string
   updatedAt: string
 }
-
-export interface TestCase {
-  id: string
-  feature_id: string
-  content: any
-}
-
 export interface Plan {
   id: string
   feature_id: string
