@@ -71,11 +71,11 @@ export interface QAGenerationResponse {
   updatedAt: string
 }
 
-export interface TestCase {
-  id: string
-  feature_id: string
-  content: any
-}
+// export interface TestCase {
+//   id: string
+//   feature_id: string
+//   content: any
+// }
 
 export interface Plan {
   id: string

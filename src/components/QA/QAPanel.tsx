@@ -16,36 +16,59 @@ interface QAPanelProps {
 export default function QAPanel({ featureId, onApproved, initialTestCases = [], onTestCasesChange }: QAPanelProps) {
   const [testCases, setTestCases] = useState<TestCase[]>(initialTestCases)
   
+  // Reset locally if id changes
   useEffect(() => {
     setTestCases(initialTestCases)
-  }, [initialTestCases])
+  }, [featureId, initialTestCases])
 
+  // Fetch test cases on mount if empty
   useEffect(() => {
-    onTestCasesChange?.(testCases)
-  }, [testCases, onTestCasesChange])
+    if (testCases.length === 0) {
+      setLoading(true)
+      qaService.getTestCases(featureId)
+        .then(data => {
+          const mappedTestCases = data.content.map(tc => ({
+            ...tc,
+            status: tc.status || ('pending' as const)
+          }))
+          setTestCases(mappedTestCases)
+          onTestCasesChange?.(mappedTestCases)
+        })
+        .catch(err => {
+          console.error('Failed to fetch test cases', err)
+        })
+        .finally(() => setLoading(false))
+    }
+  }, [featureId])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [prompt, setPrompt] = useState('')
   const [showPromptInput, setShowPromptInput] = useState(false)
+  console.log('mappedTestCases0----->>>')
 
-  async function handleGenerate() {
+  async function handleGenerate(customPrompt?: string) {
     setLoading(true)
     setError('')
+    setTestCases([])
     try {
-      const data = await qaService.generateTestCases(featureId)
+      const isRegeneration = testCases.length > 0 || !!customPrompt
+      const data = isRegeneration 
+        ? await qaService.updateTestCases(featureId, customPrompt)
+        : await qaService.generateTestCases(featureId)
       
       const mappedTestCases = data.content.map(tc => ({
         ...tc,
         status: tc.status || ('pending' as const)
       }))
+
       
       setTestCases(mappedTestCases)
-      // onApproved?.()
+      onTestCasesChange?.(mappedTestCases)
       setShowPromptInput(false)
-      setPrompt('')
     } catch (err: any) {
       setError('Failed to generate test cases. Please try again.')
     } finally {
+      setPrompt('')
       setLoading(false)
     }
   }
@@ -55,9 +78,17 @@ export default function QAPanel({ featureId, onApproved, initialTestCases = [], 
     setTestCases(prev => prev.map(tc => tc.id === testCaseId ? { ...tc, status } : tc))
   }
 
-  function handleApproveAll() {
-    // Advance directly since no other endpoints are implemented yet
-    if (onApproved) onApproved()
+  async function handleApproveAll() {
+    setLoading(true)
+    setError('')
+    try {
+      await qaService.approveTestCases(featureId)
+      if (onApproved) onApproved()
+    } catch (err) {
+      setError('Failed to approve test cases. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -73,7 +104,7 @@ export default function QAPanel({ featureId, onApproved, initialTestCases = [], 
           <Button 
             variant="primary" 
             size="sm" 
-            onClick={()=>{}} 
+            onClick={() => handleGenerate()} 
             loading={loading && !showPromptInput}
             disabled={loading}
           >
@@ -96,7 +127,7 @@ export default function QAPanel({ featureId, onApproved, initialTestCases = [], 
           <div className="flex justify-end mt-2">
             <Button 
               size="sm" 
-              onClick={()=>{}} 
+              onClick={() => handleGenerate(prompt)} 
               loading={loading}
               disabled={!prompt.trim()}
             >
@@ -116,20 +147,17 @@ export default function QAPanel({ featureId, onApproved, initialTestCases = [], 
             <Card 
               key={tc.id || index} 
               padding="sm"
-              className={`overflow-hidden border-l-4 transition-all duration-200 hover:shadow-md ${
-                tc.status === 'approved' ? 'border-l-green-500' : 
-                tc.status === 'rejected' ? 'border-l-red-500' : 'border-l-blue-500'
-              }`}
+              className="overflow-hidden border-l-4 transition-all duration-200 hover:shadow-md border-l-blue-500"
             >
               <div className="flex justify-between items-start gap-4 mb-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${
+                    {/* <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${
                       tc.status === 'approved' ? 'bg-green-100 text-green-700' : 
                       tc.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
                     }`}>
                       {tc.status || 'pending'}
-                    </span>
+                    </span> */}
                     <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${
                       tc.type === 'functional' ? 'bg-purple-100 text-purple-700' : 
                       tc.type === 'negative' ? 'bg-orange-100 text-orange-700' : 
@@ -142,7 +170,7 @@ export default function QAPanel({ featureId, onApproved, initialTestCases = [], 
                     </h3>
                   </div>
                 </div>
-                <div className="flex gap-1">
+                {/* <div className="flex gap-1">
                   <button 
                     onClick={() => handleUpdateStatus(tc.id, 'approved')}
                     className={`p-1.5 rounded-md transition-colors ${
@@ -165,7 +193,7 @@ export default function QAPanel({ featureId, onApproved, initialTestCases = [], 
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
-                </div>
+                </div> */}
               </div>
 
               <div className="space-y-3">
@@ -189,6 +217,8 @@ export default function QAPanel({ featureId, onApproved, initialTestCases = [], 
             className="mt-6" 
             fullWidth 
             onClick={handleApproveAll}
+            loading={loading}
+            disabled={loading}
           >
             Approve All & Continue
           </Button>
