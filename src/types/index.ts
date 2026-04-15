@@ -78,8 +78,10 @@ export interface TestCase {
 }
 
 export interface Plan {
-  id: string
+  _id: string
   feature_id: string
   content: string
   refinements: string[]
+  createdAt: string
+  updatedAt: string
 }

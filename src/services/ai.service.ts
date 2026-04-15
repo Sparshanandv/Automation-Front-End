@@ -12,8 +12,19 @@ export const aiService = {
     return res.data
   },
 
-  async generatePlan(featureId: string, refinement?: string): Promise<Plan> {
-    const res = await api.post<Plan>(`/ai/plan/generate/${featureId}`, { refinement })
+  async generatePlan(
+    featureId: string,
+    body: { userStory: string; testCases: unknown[]; optionalPrompt?: string }
+  ): Promise<Plan> {
+    const res = await api.post<Plan>(`/ai/plan/generate/${featureId}`, body)
     return res.data
-  }
+  },
+
+  async approvePlan(featureId: string): Promise<void> {
+    await api.post(`/ai/plan/approve/${featureId}`)
+  },
+
+  async rejectPlan(featureId: string): Promise<void> {
+    await api.post(`/ai/plan/reject/${featureId}`)
+  },
 }
