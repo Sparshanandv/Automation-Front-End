@@ -12,13 +12,18 @@ export const featureService = {
     return res.data
   },
 
-  async create(title: string, description: string, criteria: string, projectId?: string): Promise<Feature> {
-    const res = await api.post<Feature>('/features', { title, description, criteria, ...(projectId && { projectId }) })
+  async create(title: string, description: string, criteria: string, type: string, projectId?: string): Promise<Feature> {
+    const res = await api.post<Feature>('/features', { title, description, criteria, type, ...(projectId && { projectId }) })
     return res.data
   },
 
   async updateStatus(id: string, status: FeatureStatus): Promise<Feature> {
     const res = await api.patch<Feature>(`/features/${id}/status`, { status })
+    return res.data
+  },
+
+  async getTypes(): Promise<string[]> {
+    const res = await api.get<string[]>('/features/types')
     return res.data
   },
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Button from '../Button/Button'
 import Input from '../Input/Input'
+import RichTextEditor from '../common/RichTextEditor'
 
 interface CreateProjectModalProps {
   isOpen: boolean
@@ -24,7 +25,7 @@ export default function CreateProjectModal({ isOpen, onClose, onSubmit }: Create
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-bold mb-4">Create New Project</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -37,13 +38,11 @@ export default function CreateProjectModal({ isOpen, onClose, onSubmit }: Create
             />
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
-            <textarea
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              placeholder="Brief description of the project"
-              rows={3}
+            <label className="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
+            <RichTextEditor
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={setDescription}
+              placeholder="Brief description of the project"
             />
           </div>
           <div className="flex justify-end space-x-3">

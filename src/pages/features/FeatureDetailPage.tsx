@@ -9,6 +9,8 @@ import Alert from '../../components/Alert/Alert'
 import QAPanel from '../../components/QA/QAPanel'
 import DevPlanGenerator from '../../components/features/DevPlanGenerator'
 
+import DescriptionDisplay from '../../components/common/DescriptionDisplay'
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
@@ -22,12 +24,12 @@ export default function FeatureDetailPage() {
 
   const [feature, setFeature] = useState<Feature | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError]     = useState('')
+  const [error, setError] = useState('')
   const [advancing, setAdvancing] = useState(false)
   const [testCases, setTestCases] = useState<TestCase[]>([])
 
-  const fetchFeatureDetails = () =>{
-    featureService.getById(id)
+  const fetchFeatureDetails = () => {
+    featureService.getById(id!)
       .then(setFeature)
       .catch(() => setError('Failed to load task'))
       .finally(() => setLoading(false))
@@ -36,7 +38,7 @@ export default function FeatureDetailPage() {
   useEffect(() => {
     if (!id) return
     fetchFeatureDetails()
-    
+
     // Load test cases from localStorage
     const saved = localStorage.getItem(`test-cases-${id}`)
     if (saved) {
@@ -69,14 +71,14 @@ export default function FeatureDetailPage() {
     try {
       if (feature.status === 'CREATED') {
         const data = await qaService.generateTestCases(feature.id)
-        
+
         const mappedTestCases = data.content.map(tc => ({
           ...tc,
           status: tc.status || ('pending' as const)
         }))
         setTestCases(mappedTestCases)
-      fetchFeatureDetails();
-      }else{
+        fetchFeatureDetails();
+      } else {
         const updated = await featureService.updateStatus(feature.id, next)
         setFeature(updated)
       }
@@ -108,20 +110,32 @@ export default function FeatureDetailPage() {
             {/* Title + status */}
             <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4">
               <div className="flex items-start justify-between gap-4 mb-4">
-                <h1 className="text-xl font-bold text-gray-900">{feature.title}</h1>
+                <div className="flex flex-col gap-1 min-w-0 break-words">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-400 tracking-wider">#{feature.featureKey}</span>
+                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${feature.type === 'bug' ? 'bg-red-100 text-red-700' :
+                      feature.type === 'hotfix' ? 'bg-orange-100 text-orange-700' :
+                        feature.type === 'feature' ? 'bg-purple-100 text-purple-700' :
+                          'bg-blue-100 text-blue-700'
+                      }`}>
+                      {feature.type || 'task'}
+                    </span>
+                  </div>
+                  <h1 className="text-xl font-bold text-gray-900">{feature.title}</h1>
+                </div>
                 <span className="shrink-0 text-xs font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                   {STATUS_LABELS[feature.status]}
                 </span>
               </div>
 
-              <div className="mb-4">
+              <div className="mb-6">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Description</p>
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">{feature.description}</p>
+                <DescriptionDisplay content={feature.description} />
               </div>
 
               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Acceptance Criteria</p>
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">{feature.criteria}</p>
+                <DescriptionDisplay content={feature.criteria} maxHeight={150} />
               </div>
             </div>
 
@@ -130,37 +144,34 @@ export default function FeatureDetailPage() {
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Status Timeline</p>
               <div className="flex items-center gap-0">
                 {STATUS_ORDER.map((status, index) => {
-                  const isPast    = index < currentIndex
+                  const isPast = index < currentIndex
                   const isCurrent = index === currentIndex
-                  const isLast    = index === STATUS_ORDER.length - 1
+                  const isLast = index === STATUS_ORDER.length - 1
 
                   return (
                     <div key={status} className="flex items-center flex-1 min-w-0">
                       <div className="flex flex-col items-center gap-1 shrink-0">
                         <div
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
-                            isPast    ? 'bg-green-500 border-green-500 text-white'
+                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${isPast ? 'bg-green-500 border-green-500 text-white'
                             : isCurrent ? 'bg-blue-600 border-blue-600 text-white scale-110'
-                            : 'bg-white border-gray-300 text-gray-400'
-                          }`}
+                              : 'bg-white border-gray-300 text-gray-400'
+                            }`}
                         >
                           {isPast ? '✓' : index + 1}
                         </div>
                         <span
-                          className={`text-center leading-tight whitespace-nowrap text-[10px] ${
-                            isCurrent ? 'text-blue-600 font-semibold'
-                            : isPast  ? 'text-green-600'
-                            : 'text-gray-400'
-                          }`}
+                          className={`text-center leading-tight whitespace-nowrap text-[10px] ${isCurrent ? 'text-blue-600 font-semibold'
+                            : isPast ? 'text-green-600'
+                              : 'text-gray-400'
+                            }`}
                         >
                           {STATUS_LABELS[status]}
                         </span>
                       </div>
                       {!isLast && (
                         <div
-                          className={`flex-1 h-0.5 mx-1 mb-4 ${
-                            isPast ? 'bg-green-400' : 'bg-gray-200'
-                          }`}
+                          className={`flex-1 h-0.5 mx-1 mb-4 ${isPast ? 'bg-green-400' : 'bg-gray-200'
+                            }`}
                         />
                       )}
                     </div>
@@ -197,20 +208,20 @@ export default function FeatureDetailPage() {
             {/* QA Section */}
             {feature.status === 'QA' && (
               <div className="mb-8">
-                <QAPanel 
-                  featureId={feature.id} 
-                  onApproved={handleAdvance} 
+                <QAPanel
+                  featureId={feature.id}
+                  onApproved={handleAdvance}
                   initialTestCases={testCases}
                   onTestCasesChange={setTestCases}
-                  />
-                  </div>
-                  )}
+                />
+              </div>
+            )}
             {/* AI Dev Plan Generation Module */}
             {feature.status === 'DEV' && (
               <div className="mb-4">
-                <DevPlanGenerator 
-                  feature={feature} 
-                  onStatusUpdated={(updated) => setFeature(updated)} 
+                <DevPlanGenerator
+                  feature={feature}
+                  onStatusUpdated={(updated) => setFeature(updated)}
                 />
               </div>
             )}
