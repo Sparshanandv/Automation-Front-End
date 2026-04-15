@@ -18,12 +18,14 @@ export const featureService = {
     title: string,
     description: string,
     criteria: string,
+    type: string,
     projectId?: string,
   ): Promise<Feature> {
     const res = await api.post<Feature>("/features", {
       title,
       description,
       criteria,
+      type,
       ...(projectId && { projectId }),
     });
     return res.data;
@@ -48,8 +50,13 @@ export const featureService = {
     return res.data;
   },
 
+  async getTypes(): Promise<string[]> {
+    const res = await api.get<string[]>('/features/types')
+    return res.data
+  },
   async deleteFeature(id: string): Promise<Feature> {
     const res = await api.delete<Feature>(`/features/${id}`);
     return res.data;
   },
-};
+}
+  

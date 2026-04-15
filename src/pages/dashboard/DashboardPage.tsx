@@ -8,6 +8,7 @@ import CreateProjectModal from '../../components/Modals/CreateProjectModal'
 import Button from '../../components/Button/Button'
 import Card from '../../components/Card/Card'
 import { Project } from '../../types/project'
+import { stripHtml } from '../../utils/stringUtils'
 
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -46,13 +47,13 @@ export default function DashboardPage() {
     <PageWrapper>
       <div className="mb-6">
         <div className="flex justify-between items-center mb-8">
-         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Your Projects</h2>
-          <p className="text-sm text-gray-500 mt-1">Manage your active projects and repositories.</p>
-        </div>
-        <Button onClick={() => setIsModalOpen(true)}>
-          + New Project
-        </Button>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Your Projects</h2>
+            <p className="text-sm text-gray-500 mt-1">Manage your active projects and repositories.</p>
+          </div>
+          <Button onClick={() => setIsModalOpen(true)}>
+            + New Project
+          </Button>
         </div>
       </div>
 
@@ -77,9 +78,16 @@ export default function DashboardPage() {
               className="block hover:shadow-md transition-shadow rounded-2xl"
             >
               <Card className="h-full hover:border-blue-300 transition-colors">
-                <h3 className="text-lg font-semibold text-gray-900 truncate mb-2">{project.name}</h3>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-lg font-semibold text-gray-900 truncate flex-1">{project.name}</h3>
+                  {project.projectKey && (
+                    <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded ml-2 shrink-0">
+                      {project.projectKey}
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-gray-500 mb-4 line-clamp-2 min-h-10">
-                  {project.description || 'No description provided.'}
+                  {project.description ? stripHtml(project.description) : 'No description provided.'}
                 </p>
                 <div className="flex justify-between items-center text-xs text-gray-400">
                   <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>

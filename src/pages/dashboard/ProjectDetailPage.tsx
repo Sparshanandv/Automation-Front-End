@@ -9,6 +9,7 @@ import AddRepositoryModal from '../../components/Modals/AddRepositoryModal'
 import Button from '../../components/Button/Button'
 import Card from '../../components/Card/Card'
 import { Project } from '../../types/project'
+import DescriptionDisplay from '../../components/common/DescriptionDisplay'
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -76,15 +77,19 @@ export default function ProjectDetailPage() {
           &larr; Back to Dashboard
         </Link>
         <div className="flex justify-between items-start">
-         <div className="max-w-[50vw]">
-            <h1 className="text-3xl font-bold text-gray-900 break-words">
-              {project.name}
-            </h1>
-
-            <p className="text-gray-500 mt-2 line-clamp-3 break-words">
-              {project.description || 'No description provided.'}
-            </p>
-        </div>
+          <div className="flex-1 mr-8 min-w-0">
+            <div className="flex items-center gap-3 max-w-[50vw]">
+              <h1 className="text-3xl font-bold text-gray-900 break-words line-clamp-2">{project.name}</h1>
+              {project.projectKey && (
+                <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded tracking-wider mt-1 shrink-0">
+                  {project.projectKey}
+                </span>
+              )}
+            </div>
+            <div className="mt-4">
+              <DescriptionDisplay content={project.description || 'No description provided.'} />
+            </div>
+          </div>
           <div className="flex space-x-3">
             <Button variant="danger" onClick={handleDeleteProject}>
               Delete Project

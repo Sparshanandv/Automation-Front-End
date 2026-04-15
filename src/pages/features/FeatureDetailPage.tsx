@@ -18,6 +18,8 @@ import Alert from "../../components/Alert/Alert";
 import QAPanel from "../../components/QA/QAPanel";
 import DevPlanGenerator from "../../components/features/DevPlanGenerator";
 
+import DescriptionDisplay from '../../components/common/DescriptionDisplay'
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString("en-US", {
     month: "short",
@@ -32,15 +34,14 @@ export default function FeatureDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [feature, setFeature] = useState<Feature | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [advancing, setAdvancing] = useState(false);
-  const [testCases, setTestCases] = useState<TestCase[]>([]);
+  const [feature, setFeature] = useState<Feature | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [advancing, setAdvancing] = useState(false)
+  const [testCases, setTestCases] = useState<TestCase[]>([])
 
   const fetchFeatureDetails = () => {
-    featureService
-      .getById(id)
+    featureService.getById(id!)
       .then(setFeature)
       .catch(() => setError("Failed to load task"))
       .finally(() => setLoading(false));
@@ -80,18 +81,18 @@ export default function FeatureDetailPage() {
     setAdvancing(true);
     setError("");
     try {
-      if (feature.status === "CREATED") {
-        const data = await qaService.generateTestCases(feature.id);
+      if (feature.status === 'CREATED') {
+        const data = await qaService.generateTestCases(feature.id)
 
-        const mappedTestCases = data.content.map((tc) => ({
+        const mappedTestCases = data.content.map(tc => ({
           ...tc,
-          status: tc.status || ("pending" as const),
-        }));
-        setTestCases(mappedTestCases);
+          status: tc.status || ('pending' as const)
+        }))
+        setTestCases(mappedTestCases)
         fetchFeatureDetails();
       } else {
-        const updated = await featureService.updateStatus(feature.id, next);
-        setFeature(updated);
+        const updated = await featureService.updateStatus(feature.id, next)
+        setFeature(updated)
       }
     } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to update status");
@@ -121,24 +122,34 @@ export default function FeatureDetailPage() {
             {/* Title + status */}
             <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4">
               <div className="flex items-start justify-between gap-4 mb-4">
-                <h1 className="text-xl font-bold text-gray-900">
-                  {feature.title}
-                </h1>
+                <div className="flex flex-col gap-1 min-w-0 break-words">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-400 tracking-wider">#{feature.featureKey}</span>
+                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${feature.type === 'bug' ? 'bg-red-100 text-red-700' :
+                      feature.type === 'hotfix' ? 'bg-orange-100 text-orange-700' :
+                        feature.type === 'feature' ? 'bg-purple-100 text-purple-700' :
+                          'bg-blue-100 text-blue-700'
+                      }`}>
+                      {feature.type || 'task'}
+                    </span>
+                  </div>
+                  <h1 className="text-xl font-bold text-gray-900">{feature.title}</h1>
+                </div>
                 <span className="shrink-0 text-xs font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                   {STATUS_LABELS[feature.status]}
                 </span>
               </div>
 
-              <div className="mb-4">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">
-                  Description
-                </p>
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                  {feature.description}
-                </p>
+              <div className="mb-6">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Description</p>
+                <DescriptionDisplay content={feature.description} />
               </div>
 
               <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Acceptance Criteria</p>
+                <DescriptionDisplay content={feature.criteria} maxHeight={150} />
+              </div>
+               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">
                   Acceptance Criteria
                 </p>

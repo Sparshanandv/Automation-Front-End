@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { Feature } from "../../types";
-import { featureService } from "../../services/feature.service";
+import { useEffect, useState } from 'react'
+import { Feature } from '../../types'
+import { featureService } from '../../services/feature.service'
+import RichTextEditor from '../common/RichTextEditor'
 
 interface Props {
   onClose: () => void;
@@ -10,28 +11,27 @@ interface Props {
   featureToEdit?: Feature;
 }
 
-export default function CreateFeatureModal({
-  onClose,
-  onCreate,
-  onUpdate,
-  projectId,
-  featureToEdit,
-}: Props) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [criteria, setCriteria] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+export default function CreateFeatureModal({ onClose, onCreate, projectId,  onUpdate 
+, featureToEdit}: Props) {
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [criteria, setCriteria] = useState('')
+  const [type, setType] = useState('task')
+  const [types, setTypes] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const isEditMode = !!featureToEdit;
+    const isEditMode = !!featureToEdit;
+
 
   useEffect(() => {
-    if (featureToEdit) {
+    featureService.getTypes().then(setTypes).catch(console.error)
+     if (featureToEdit) {
       setTitle(featureToEdit.title);
       setDescription(featureToEdit.description);
       setCriteria(featureToEdit.criteria);
     }
-  }, [featureToEdit]);
+  }, [featureToEdit])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,6 +57,7 @@ export default function CreateFeatureModal({
           title.trim(),
           description.trim(),
           criteria.trim(),
+           type,
           projectId,
         );
         onCreate?.(feature);
@@ -75,7 +76,7 @@ export default function CreateFeatureModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <h2 className="text-base font-semibold text-gray-900">
             {isEditMode ? "Edit Task" : "Create Task"}
@@ -95,28 +96,36 @@ export default function CreateFeatureModal({
             </p>
           )}
 
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-              Title
-            </label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="What needs to be built?"
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1 col-span-1">
+              <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Title</label>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="What needs to be built?"
+                className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex flex-col gap-1 col-span-1">
+              <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Type</label>
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              >
+                {types.map(t => (
+                  <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-              Description
-            </label>
-            <textarea
+            <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Description</label>
+            <RichTextEditor
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={setDescription}
               placeholder="Describe the feature in detail…"
-              rows={3}
-              className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />
           </div>
 
