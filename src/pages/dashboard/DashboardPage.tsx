@@ -32,7 +32,7 @@ export default function DashboardPage() {
     }
   }
 
-  const handleCreateProject = async (data: { name: string; description: string }) => {
+  const handleCreateProject = async (data: { name: string; description: string; githubToken: string }) => {
     try {
       await api.post('/projects', data)
       setIsModalOpen(false)
@@ -74,7 +74,7 @@ export default function DashboardPage() {
             <Link
               key={project._id}
               to={`/projects/${project._id}`}
-              className="block hover:shadow-md transition-shadow"
+              className="block hover:shadow-md transition-shadow rounded-2xl"
             >
               <Card className="h-full hover:border-blue-300 transition-colors">
                 <h3 className="text-lg font-semibold text-gray-900 truncate mb-2">{project.name}</h3>
@@ -83,6 +83,15 @@ export default function DashboardPage() {
                 </p>
                 <div className="flex justify-between items-center text-xs text-gray-400">
                   <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>
+                  {project.createdByEmail && (
+                    <span className="flex items-center gap-1 min-w-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                      <span className="truncate max-w-[120px]">{project.createdByEmail}</span>
+                    </span>
+                  )}
                 </div>
               </Card>
             </Link>

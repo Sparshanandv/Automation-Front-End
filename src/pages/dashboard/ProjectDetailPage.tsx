@@ -17,6 +17,8 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [unlinkingRepoId, setUnlinkingRepoId] = useState<string | null>(null)
+  const [unlinkError, setUnlinkError] = useState('')
 
   useEffect(() => {
     fetchProject()
@@ -41,13 +43,15 @@ export default function ProjectDetailPage() {
     fetchProject()
   }
 
-  const handleRemoveRepository = async (repoId: string) => {
-    if (!confirm('Are you sure you want to remove this repository?')) return
+  const handleUnlinkRepository = async (repoId: string) => {
     try {
+      setUnlinkError('')
       await api.delete(`/projects/${id}/repos/${repoId}`)
+      setUnlinkingRepoId(null)
       fetchProject()
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to remove repository')
+      setUnlinkError(err.response?.data?.message || 'Failed to unlink repository')
+      setUnlinkingRepoId(null)
     }
   }
 
@@ -72,10 +76,15 @@ export default function ProjectDetailPage() {
           &larr; Back to Dashboard
         </Link>
         <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
-            <p className="text-gray-500 mt-2 max-w-2xl">{project.description || 'No description provided.'}</p>
-          </div>
+         <div className="max-w-[50vw]">
+            <h1 className="text-3xl font-bold text-gray-900 break-words">
+              {project.name}
+            </h1>
+
+            <p className="text-gray-500 mt-2 line-clamp-3 break-words">
+              {project.description || 'No description provided.'}
+            </p>
+        </div>
           <div className="flex space-x-3">
             <Button variant="danger" onClick={handleDeleteProject}>
               Delete Project
@@ -86,6 +95,8 @@ export default function ProjectDetailPage() {
           </div>
         </div>
       </div>
+
+      {unlinkError && <Alert message={unlinkError} variant="error" className="mt-4" />}
 
       <div className="mt-10">
         <div className="flex items-center gap-4 mb-4 justify-between">
@@ -140,14 +151,34 @@ export default function ProjectDetailPage() {
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveRepository(repo._id)}
-                        className="text-red-600 hover:text-red-900 hover:bg-red-50"
-                      >
-                        Remove
-                      </Button>
+                      {unlinkingRepoId === repo._id ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-xs text-gray-500">Unlink this repo?</span>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleUnlinkRepository(repo._id)}
+                          >
+                            Yes, unlink
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setUnlinkingRepoId(null)}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => { setUnlinkError(''); setUnlinkingRepoId(repo._id) }}
+                          className="text-red-600 hover:text-red-900 hover:bg-red-50"
+                        >
+                          Unlink
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -160,6 +191,7 @@ export default function ProjectDetailPage() {
       <AddRepositoryModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        projectId={project._id}
         onSubmit={handleAddRepository}
       />
     </PageWrapper>
