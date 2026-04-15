@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Feature, FeatureStatus, StatusHistoryEntry, TestCase } from '../../types'
+import { Feature, FeatureStatus, TestCase } from '../../types'
 import { featureService } from '../../services/feature.service'
 import { qaService } from '../../services/qa.service'
 import { STATUS_ORDER, STATUS_LABELS, getNextStatus } from '../../utils/statusUtils'
@@ -27,6 +27,7 @@ export default function FeatureDetailPage() {
   const [testCases, setTestCases] = useState<TestCase[]>([])
 
   const fetchFeatureDetails = () =>{
+    if (!id) return
     featureService.getById(id)
       .then(setFeature)
       .catch(() => setError('Failed to load task'))
@@ -91,7 +92,7 @@ export default function FeatureDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Back */}
         <button
           onClick={() => navigate('/features')}
@@ -105,115 +106,111 @@ export default function FeatureDetailPage() {
 
         {feature && (
           <>
-            {/* Title + status */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4">
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <h1 className="text-xl font-bold text-gray-900">{feature.title}</h1>
-                <span className="shrink-0 text-xs font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
-                  {STATUS_LABELS[feature.status]}
-                </span>
-              </div>
-
-              <div className="mb-4">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Description</p>
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">{feature.description}</p>
-              </div>
-
-              <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Acceptance Criteria</p>
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">{feature.criteria}</p>
-              </div>
-            </div>
-
-            {/* Status Timeline */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Status Timeline</p>
-              <div className="flex items-center gap-0">
-                {STATUS_ORDER.map((status, index) => {
-                  const isPast    = index < currentIndex
-                  const isCurrent = index === currentIndex
-                  const isLast    = index === STATUS_ORDER.length - 1
-
-                  return (
-                    <div key={status} className="flex items-center flex-1 min-w-0">
-                      <div className="flex flex-col items-center gap-1 shrink-0">
-                        <div
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
-                            isPast    ? 'bg-green-500 border-green-500 text-white'
-                            : isCurrent ? 'bg-blue-600 border-blue-600 text-white scale-110'
-                            : 'bg-white border-gray-300 text-gray-400'
-                          }`}
-                        >
-                          {isPast ? '✓' : index + 1}
-                        </div>
-                        <span
-                          className={`text-center leading-tight whitespace-nowrap text-[10px] ${
-                            isCurrent ? 'text-blue-600 font-semibold'
-                            : isPast  ? 'text-green-600'
-                            : 'text-gray-400'
-                          }`}
-                        >
-                          {STATUS_LABELS[status]}
-                        </span>
-                      </div>
-                      {!isLast && (
-                        <div
-                          className={`flex-1 h-0.5 mx-1 mb-4 ${
-                            isPast ? 'bg-green-400' : 'bg-gray-200'
-                          }`}
-                        />
-                      )}
+            <div className="grid gap-6 xl:grid-cols-[1.45fr_1fr]">
+              <div className="space-y-4">
+                {/* Title + status */}
+                <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div>
+                      <h1 className="text-xl font-bold text-gray-900">{feature.title}</h1>
+                      <p className="text-sm text-gray-500 mt-1">Feature details and acceptance criteria</p>
                     </div>
-                  )
-                })}
-              </div>
-            </div>
+                    <span className="shrink-0 text-xs font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
+                      {STATUS_LABELS[feature.status]}
+                    </span>
+                  </div>
 
-            {/* Status History */}
-            {feature.statusHistory?.length > 0 && (
-              <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Status History</p>
-                <div className="flex flex-col gap-3">
-                  {[...feature.statusHistory].reverse().map((entry: StatusHistoryEntry, i: number) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2 flex-wrap">
-                          <span className="text-sm font-medium text-gray-800">
-                            {STATUS_LABELS[entry.status]}
-                          </span>
-                          <span className="text-xs text-gray-400 shrink-0">
-                            {formatDate(entry.changedAt)}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-0.5">by {entry.changedBy.email}</p>
-                      </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Description</p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{feature.description}</p>
                     </div>
-                  ))}
+                    <div>
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Acceptance Criteria</p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{feature.criteria}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* QA Section */}
+                {feature.status === 'QA' && (
+                  <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                    <h2 className="text-sm font-semibold text-gray-900 mb-4">QA Panel</h2>
+                    <QAPanel 
+                      featureId={feature.id} 
+                      onApproved={handleAdvance} 
+                      initialTestCases={testCases}
+                      onTestCasesChange={setTestCases}
+                    />
+                  </div>
+                )}
+
+                {/* AI Dev Plan Generation Module */}
+                {feature.status === 'DEV' && (
+                  <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                    <h2 className="text-sm font-semibold text-gray-900 mb-4">Development Plan</h2>
+                    <DevPlanGenerator 
+                      feature={feature} 
+                      onStatusUpdated={(updated) => setFeature(updated)} 
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                {/* Status Timeline and History */}
+                <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                  <div className="flex items-center justify-between gap-4 mb-4">
+                    <div>
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Status Timeline</p>
+                      <p className="text-sm text-gray-500 mt-1">Progress and matching history entries</p>
+                    </div>
+                    <span className="text-xs text-gray-500">{feature.statusHistory?.length ?? 0} updates</span>
+                  </div>
+
+                  <div className="grid gap-4">
+                    {STATUS_ORDER.map((status, index) => {
+                      const isPast = index < currentIndex
+                      const isCurrent = index === currentIndex
+                      const entry = feature.statusHistory?.find((item) => item.status === status)
+                      const markerBg = isPast ? 'bg-green-500 border-green-500 text-white' : isCurrent ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-300 text-gray-400'
+
+                      return (
+                        <div key={status} className="grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)] items-start rounded-2xl border border-gray-200 p-4 bg-slate-50">
+                          <div className="flex items-center gap-3">
+                            <div className={`flex h-9 w-9 items-center justify-center rounded-full border-2 ${markerBg}`}>
+                              <span className="text-sm font-bold">{isPast ? '✓' : index + 1}</span>
+                            </div>
+                            <div>
+                              <p className={`text-sm font-semibold ${isCurrent ? 'text-blue-600' : isPast ? 'text-green-600' : 'text-gray-500'}`}>
+                                {STATUS_LABELS[status]}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {entry ? formatDate(entry.changedAt) : 'No update yet'}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="text-sm text-gray-600">
+                            {entry ? (
+                              <p>Changed by {entry.changedBy.email}</p>
+                            ) : (
+                              <p className="text-gray-500">This status has not been reached yet.</p>
+                            )}
+                          </div>
+
+                          {isCurrent && (
+                            <span className="self-center rounded-full bg-blue-100 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-blue-700">
+                              Current
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
-            )}
-
-            {/* QA Section */}
-            {feature.status === 'QA' && (
-              <div className="mb-8">
-                <QAPanel 
-                  featureId={feature.id} 
-                  onApproved={handleAdvance} 
-                  initialTestCases={testCases}
-                  onTestCasesChange={setTestCases}
-                  />
-                  </div>
-                  )}
-            {/* AI Dev Plan Generation Module */}
-            {feature.status === 'DEV' && (
-              <div className="mb-4">
-                <DevPlanGenerator 
-                  feature={feature} 
-                  onStatusUpdated={(updated) => setFeature(updated)} 
-                />
-              </div>
-            )}
+            </div>
 
             {/* Advance button */}
             {getNextStatus(feature.status) && feature.status !== 'QA' && feature.status !== 'DEV' && (
