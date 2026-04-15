@@ -27,7 +27,8 @@ export interface Project {
   id: string
   name: string
   description: string
-  repositories: Repository[]
+  projectKey?: string
+  repositories?: Repository[]
 }
 
 export interface StatusHistoryEntry {
@@ -40,9 +41,11 @@ export interface Feature {
   id: string
   featureKey: string
   title: string
+  type: string
   description: string
   criteria: string
   status: FeatureStatus
+  createdBy: { id: string; email: string }
   statusHistory: StatusHistoryEntry[]
   projectId: string | null
   createdAt: string
