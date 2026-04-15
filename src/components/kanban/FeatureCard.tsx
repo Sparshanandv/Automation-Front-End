@@ -1,8 +1,10 @@
+
 import { useNavigate } from "react-router-dom";
 import { Feature, FeatureStatus } from "../../types";
 import { STATUS_LABELS, getNextStatus } from "../../utils/statusUtils";
 import Button from "../Button/Button";
 import { Icons } from "../Icons/Icons";
+import DescriptionDisplay from "../common/DescriptionDisplay";
 
 interface Props {
   feature: Feature;
@@ -82,7 +84,7 @@ export default function FeatureCard({
       </div>
 
       <p className="text-xs text-gray-400 mb-3 line-clamp-1">
-        {feature.description}
+          <DescriptionDisplay content={feature.description} />
       </p>
 
       <div className="flex items-center justify-between text-gray-500 mb-3">

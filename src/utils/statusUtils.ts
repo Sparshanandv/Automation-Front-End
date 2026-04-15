@@ -1,4 +1,4 @@
-import { FeatureStatus } from "../types";
+import { Feature, FeatureStatus } from "../types";
 
 export const STATUS_ORDER: FeatureStatus[] = [
   "CREATED",
@@ -34,4 +34,12 @@ export const NEXT_STATUS: Partial<Record<FeatureStatus, FeatureStatus>> = {
 
 export function getNextStatus(status: FeatureStatus): FeatureStatus | null {
   return NEXT_STATUS[status] ?? null;
+}
+
+export function validateFeatureMove(
+  feature: Feature,
+  targetStatus: FeatureStatus,
+): { isValid: boolean; errorMsg?: string } {
+  // TODO: Add specific validation rules here
+  return { isValid: true };
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Feature, FeatureStatus } from "../../types";
-import { STATUS_ORDER, NEXT_STATUS } from "../../utils/statusUtils";
+import { STATUS_ORDER, NEXT_STATUS, validateFeatureMove } from "../../utils/statusUtils";
+import StatusBlockedModal from "../Modals/StatusBlockedModal";
 import KanbanColumn from "./KanbanColumn";
 import { featureService } from "../../services/feature.service";
 
@@ -19,6 +20,7 @@ export default function KanbanBoard({
 }: Props) {
   const [dragging, setDragging] = useState<Feature | null>(null);
   const [movingId, setMovingId] = useState<string | null>(null);
+  const [blockedMsg, setBlockedMsg] = useState<string | null>(null);
 
   function handleDragStart(feature: Feature) {
     setDragging(feature);
@@ -38,21 +40,13 @@ export default function KanbanBoard({
     setDragging(null);
   }
 
-  function validateFeatureMove(
-    feature: Feature,
-    targetStatus: FeatureStatus,
-  ): { isValid: boolean; errorMsg?: string } {
-    // TODO: Add specific validation rules here
-    return { isValid: false };
-  }
-
   async function moveFeature(id: string, nextStatus: FeatureStatus) {
     const featureToMove = features.find((f) => f.id === id);
     if (!featureToMove) return;
 
     const validation = validateFeatureMove(featureToMove, nextStatus);
     if (!validation.isValid) {
-      alert(validation.errorMsg || `Cannot move to ${nextStatus}.`);
+      setBlockedMsg(validation.errorMsg || `Cannot move task to ${nextStatus}.`);
       return;
     }
 
@@ -82,6 +76,12 @@ export default function KanbanBoard({
     features.filter((f) => f.status === status);
 
   return (
+    <>
+    <StatusBlockedModal
+      isOpen={!!blockedMsg}
+      message={blockedMsg ?? ''}
+      onClose={() => setBlockedMsg(null)}
+    />
     <div className="flex gap-3 overflow-x-auto pb-4 min-h-[calc(100vh-180px)]">
       {STATUS_ORDER.map((status) => (
         <KanbanColumn
@@ -101,5 +101,6 @@ export default function KanbanBoard({
         />
       ))}
     </div>
+    </>
   );
 }

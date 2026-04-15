@@ -12,6 +12,7 @@ import {
   STATUS_ORDER,
   STATUS_LABELS,
   getNextStatus,
+  validateFeatureMove,
 } from "../../utils/statusUtils";
 import Spinner from "../../components/Spinner/Spinner";
 import Alert from "../../components/Alert/Alert";
@@ -19,6 +20,7 @@ import QAPanel from "../../components/QA/QAPanel";
 import DevPlanGenerator from "../../components/features/DevPlanGenerator";
 
 import DescriptionDisplay from '../../components/common/DescriptionDisplay'
+import StatusBlockedModal from '../../components/Modals/StatusBlockedModal'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString("en-US", {
@@ -38,6 +40,7 @@ export default function FeatureDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [advancing, setAdvancing] = useState(false)
+  const [blockedMsg, setBlockedMsg] = useState<string | null>(null)
   const [testCases, setTestCases] = useState<TestCase[]>([])
 
   const fetchFeatureDetails = () => {
@@ -78,6 +81,13 @@ export default function FeatureDetailPage() {
     if (!feature) return;
     const next = getNextStatus(feature.status);
     if (!next) return;
+
+    const validation = validateFeatureMove(feature, next);
+    if (!validation.isValid) {
+      setBlockedMsg(validation.errorMsg || `Cannot advance to ${next}.`);
+      return;
+    }
+
     setAdvancing(true);
     setError("");
     try {
@@ -104,6 +114,12 @@ export default function FeatureDetailPage() {
   const currentIndex = feature ? STATUS_ORDER.indexOf(feature.status) : -1;
 
   return (
+    <>
+    <StatusBlockedModal
+      isOpen={!!blockedMsg}
+      message={blockedMsg ?? ''}
+      onClose={() => setBlockedMsg(null)}
+    />
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-6 py-8">
         {/* Back */}
@@ -290,5 +306,6 @@ export default function FeatureDetailPage() {
         )}
       </div>
     </div>
+    </>
   );
 }
