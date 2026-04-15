@@ -37,29 +37,8 @@ export default function FeatureDetailPage() {
   useEffect(() => {
     if (!id) return
     fetchFeatureDetails()
-    
-    // Load test cases from localStorage
-    const saved = localStorage.getItem(`test-cases-${id}`)
-    if (saved) {
-      try {
-        setTestCases(JSON.parse(saved))
-      } catch (e) {
-        console.error('Failed to parse saved test cases', e)
-        setTestCases([])
-      }
-    } else {
-      setTestCases([])
-    }
+    setTestCases([])
   }, [id])
-
-  useEffect(() => {
-    // Only save if we have test cases AND they were loaded for the current ID
-    // We check if it's not empty, but we also need to be sure it's not the old feature's data.
-    // By resetting to [] when ID changes (see above), we avoid most issues.
-    if (id && testCases.length > 0) {
-      localStorage.setItem(`test-cases-${id}`, JSON.stringify(testCases))
-    }
-  }, [id, testCases])
 
   async function handleAdvance() {
     if (!feature) return
@@ -138,7 +117,7 @@ export default function FeatureDetailPage() {
                     <h2 className="text-sm font-semibold text-gray-900 mb-4">QA Panel</h2>
                     <QAPanel 
                       featureId={feature.id} 
-                      onApproved={handleAdvance} 
+                      onApproved={fetchFeatureDetails} 
                       initialTestCases={testCases}
                       onTestCasesChange={setTestCases}
                     />
