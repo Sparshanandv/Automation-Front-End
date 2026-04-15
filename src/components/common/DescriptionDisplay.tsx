@@ -4,33 +4,51 @@ interface DescriptionDisplayProps {
     content: string;
     maxHeight?: number;
     id?: string;
+    showReadMore?: boolean;
+    lineLimit?: number;
 }
 
-const DescriptionDisplay: React.FC<DescriptionDisplayProps> = ({ content, maxHeight = 200, id }) => {
+const DescriptionDisplay: React.FC<DescriptionDisplayProps> = ({
+    content,
+    maxHeight = 200,
+    id,
+    showReadMore = true,
+    lineLimit = 3
+}) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isOverflowing, setIsOverflowing] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (contentRef.current) {
+        if (showReadMore && contentRef.current) {
             setIsOverflowing(contentRef.current.scrollHeight > maxHeight);
         }
-    }, [content, maxHeight]);
+    }, [content, maxHeight, showReadMore]);
+
+    const truncateStyle: React.CSSProperties = !showReadMore ? {
+        display: '-webkit-box',
+        WebkitLineClamp: lineLimit,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+    } : {
+        maxHeight: !isExpanded && isOverflowing ? `${maxHeight}px` : 'none'
+    };
 
     return (
         <div className="relative" id={id}>
             <div
                 ref={contentRef}
-                className={`prose prose-sm max-w-none text-gray-600 overflow-hidden break-words transition-all duration-300 ${!isExpanded && isOverflowing ? `max-h-[${maxHeight}px]` : 'max-h-none'}`}
+                className={`prose prose-sm max-w-none text-gray-600 overflow-hidden break-words transition-all duration-300`}
                 dangerouslySetInnerHTML={{ __html: content }}
-                style={{ maxHeight: !isExpanded && isOverflowing ? `${maxHeight}px` : 'none' }}
+                style={truncateStyle}
             />
 
-            {isOverflowing && (
+            {showReadMore && isOverflowing && (
                 <div className={`mt-2 ${!isExpanded ? 'absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-white to-transparent flex items-end justify-center' : 'flex justify-center'}`}>
                     <button
                         onClick={() => setIsExpanded(!isExpanded)}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100"
+                        className="text-blue-600 hover:text-blue-800 text-xs font-medium transition-colors bg-transparent hover:underline cursor-pointer"
                     >
                         {isExpanded ? 'Read Less' : 'Read More'}
                     </button>

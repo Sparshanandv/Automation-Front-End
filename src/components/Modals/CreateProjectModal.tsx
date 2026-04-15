@@ -35,6 +35,7 @@ export default function CreateProjectModal({ isOpen, onClose, onSubmit }: Create
               label="Project Name"
               placeholder="e.g. E-Commerce App"
               value={name}
+              maxLength={50}
               onChange={(e) => setName(e.target.value)}
               required
             />

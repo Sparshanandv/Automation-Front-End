@@ -101,6 +101,7 @@ export default function CreateFeatureModal({ onClose, onCreate, projectId,  onUp
               <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Title</label>
               <input
                 value={title}
+                maxLength={50}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="What needs to be built?"
                 className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"

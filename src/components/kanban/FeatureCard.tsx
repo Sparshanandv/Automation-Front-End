@@ -69,23 +69,22 @@ export default function FeatureCard({
         </span>
 
         <span
-          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-            feature.type === "bug"
-              ? "bg-red-100 text-red-700"
-              : feature.type === "hotfix"
+          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${feature.type === "bug"
+            ? "bg-red-100 text-red-700"
+            : feature.type === "hotfix"
               ? "bg-orange-100 text-orange-700"
               : feature.type === "feature"
-              ? "bg-purple-100 text-purple-700"
-              : "bg-blue-100 text-blue-700"
-          }`}
+                ? "bg-purple-100 text-purple-700"
+                : "bg-blue-100 text-blue-700"
+            }`}
         >
           {feature.type || "task"}
         </span>
       </div>
 
-      <p className="text-xs text-gray-400 mb-3 line-clamp-1">
-          <DescriptionDisplay content={feature.description} />
-      </p>
+      <div className="text-xs text-gray-400 mb-3 min-h-[40px]">
+        <DescriptionDisplay content={feature.description} showReadMore={false} lineLimit={2} />
+      </div>
 
       <div className="flex items-center justify-between text-gray-500 mb-3">
         <div className="flex items-center gap-1.5 min-w-0">
