@@ -2,8 +2,8 @@ import api from '../utils/axios'
 import { Feature, FeatureStatus } from '../types'
 
 export const featureService = {
-  async listAll(): Promise<Feature[]> {
-    const res = await api.get<Feature[]>('/features')
+  async listAll(projectId?: string): Promise<Feature[]> {
+    const res = await api.get<Feature[]>('/features', { params: projectId ? { projectId } : undefined })
     return res.data
   },
 
@@ -12,8 +12,8 @@ export const featureService = {
     return res.data
   },
 
-  async create(title: string, description: string, criteria: string): Promise<Feature> {
-    const res = await api.post<Feature>('/features', { title, description, criteria })
+  async create(title: string, description: string, criteria: string, projectId?: string): Promise<Feature> {
+    const res = await api.post<Feature>('/features', { title, description, criteria, ...(projectId && { projectId }) })
     return res.data
   },
 

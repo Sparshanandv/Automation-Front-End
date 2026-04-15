@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
 import api from '../../utils/axios'
 import PageWrapper from '../../components/PageWrapper/PageWrapper'
 import Alert from '../../components/Alert/Alert'
@@ -13,8 +12,6 @@ import { Project } from '../../types/project'
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
-  const [summary, setSummary] = useState<Summary | null>(null)
   const [error, setError] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -57,12 +54,6 @@ export default function DashboardPage() {
           + New Project
         </Button>
         </div>
-        <button
-          onClick={() => navigate('/features')}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-        >
-          Go to Task Board →
-        </button>
       </div>
 
       {error && <Alert message={error} className="mb-6" />}
