@@ -4,6 +4,7 @@ export interface Repository {
   repo_name: string
   branch: string
   purpose: 'FE' | 'BE' | 'Infra'
+  localPath?: string
   createdAt: string
   updatedAt: string
 }
