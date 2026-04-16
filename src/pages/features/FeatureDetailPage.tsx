@@ -315,7 +315,7 @@ export default function FeatureDetailPage() {
                       <h2 className="text-sm font-semibold text-gray-900 mb-4">QA Panel</h2>
                       <QAPanel
                         featureId={feature.id}
-                        onApproved={handleAdvance}
+                        onApproved={fetchFeatureDetails}
                         initialTestCases={testCases}
                         onTestCasesChange={setTestCases}
                       />
