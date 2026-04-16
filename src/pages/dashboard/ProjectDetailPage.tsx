@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import api from '../../utils/axios'
 import PageWrapper from '../../components/PageWrapper/PageWrapper'
@@ -10,16 +10,22 @@ import Button from '../../components/Button/Button'
 import Card from '../../components/Card/Card'
 import { Project } from '../../types/project'
 import DescriptionDisplay from '../../components/common/DescriptionDisplay'
+import { useToast } from '../../context/ToastContext'
+import { projectService } from '../../services/project.service'
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const toast = useToast()
+  const readmeInputRef = useRef<HTMLInputElement>(null)
+  const pendingReadmeRepoIdRef = useRef<string | null>(null)
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [unlinkingRepoId, setUnlinkingRepoId] = useState<string | null>(null)
   const [unlinkError, setUnlinkError] = useState('')
+  const [uploadingReadmeRepoId, setUploadingReadmeRepoId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchProject()
@@ -63,6 +69,35 @@ export default function ProjectDetailPage() {
       navigate('/dashboard')
     } catch (err: any) {
       alert(err.response?.data?.message || 'Failed to delete project')
+    }
+  }
+
+  const handleUploadReadmeClick = (repoId: string) => {
+    pendingReadmeRepoIdRef.current = repoId
+    readmeInputRef.current?.click()
+  }
+
+  const handleReadmeFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    const repoId = pendingReadmeRepoIdRef.current
+    pendingReadmeRepoIdRef.current = null
+    e.target.value = ''
+    if (!file || !repoId || !id) return
+
+    const lower = file.name.toLowerCase()
+    if (!lower.endsWith('.md') && !lower.endsWith('.markdown')) {
+      toast('Please choose a Markdown file (.md or .markdown).', 'error')
+      return
+    }
+
+    try {
+      setUploadingReadmeRepoId(repoId)
+      await projectService.uploadRepoReadme(id, repoId, file)
+      toast('README updated successfully.', 'success')
+    } catch (err: any) {
+      toast(err.response?.data?.message || 'Failed to upload README.', 'error')
+    } finally {
+      setUploadingReadmeRepoId(null)
     }
   }
 
@@ -175,14 +210,27 @@ export default function ProjectDetailPage() {
                           </Button>
                         </div>
                       ) : (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => { setUnlinkError(''); setUnlinkingRepoId(repo._id) }}
-                          className="text-red-600 hover:text-red-900 hover:bg-red-50"
-                        >
-                          Unlink
-                        </Button>
+                        <div className="flex items-center justify-end gap-2 flex-wrap">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            loading={uploadingReadmeRepoId === repo._id}
+                            disabled={uploadingReadmeRepoId !== null && uploadingReadmeRepoId !== repo._id}
+                            onClick={() => handleUploadReadmeClick(repo._id)}
+                            aria-label={`Upload README for ${repo.repo_name}`}
+                          >
+                            Upload README
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => { setUnlinkError(''); setUnlinkingRepoId(repo._id) }}
+                            className="text-red-600 hover:text-red-900 hover:bg-red-50"
+                            disabled={uploadingReadmeRepoId !== null}
+                          >
+                            Unlink
+                          </Button>
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -192,6 +240,16 @@ export default function ProjectDetailPage() {
           </div>
         )}
       </div>
+
+      <input
+        ref={readmeInputRef}
+        type="file"
+        accept=".md,.markdown,text/markdown"
+        className="hidden"
+        tabIndex={-1}
+        aria-hidden
+        onChange={handleReadmeFileChange}
+      />
 
       <AddRepositoryModal
         isOpen={isModalOpen}
