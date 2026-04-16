@@ -32,4 +32,9 @@ export const aiService = {
     const res = await api.post<CodeGenerationResponse>(`/ai/execute/${featureId}`)
     return res.data
   },
+
+  async getCodeGeneration(featureId: string): Promise<CodeGenerationResponse> {
+    const res = await api.get<CodeGenerationResponse>(`/ai/execute/${featureId}`)
+    return res.data
+  },
 }

@@ -7,6 +7,7 @@ import ProjectDetailPage from '../pages/dashboard/ProjectDetailPage'
 import RepositoryDetailsPage from '../pages/repository/RepositoryDetailsPage'
 import FeaturesPage from '../pages/features/FeaturesPage'
 import FeatureDetailPage from '../pages/features/FeatureDetailPage'
+import PullRequestsPage from '../pages/PullRequestsPage'
 
 export default function AppRoutes() {
   return (
@@ -23,6 +24,7 @@ export default function AppRoutes() {
         <Route path="/repository/:owner/:repo" element={<RepositoryDetailsPage />} />
         <Route path="/features"        element={<FeaturesPage />} />
         <Route path="/features/:id"    element={<FeatureDetailPage />} />
+        <Route path="/pull-requests"   element={<PullRequestsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" replace />} />

@@ -96,3 +96,20 @@ export interface CodeGenerationResponse {
     summary: string
   }
 }
+
+export interface PullRequest {
+  _id: string
+  feature_id: string
+  pr_number: number
+  pr_url: string
+  branch_name: string
+  status: 'open' | 'closed' | 'merged'
+  title: string
+  description: string
+  repository: {
+    owner: string
+    name: string
+  }
+  createdAt: string
+  updatedAt: string
+}

@@ -625,7 +625,7 @@ export default function FeatureDetailPage() {
                   <button
                     onClick={handleAdvance}
                     disabled={advancing}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-colors disabled:opacity-50"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-colors disabled:opacity-50 mt-6"
                   >
                     {advancing
                       ? "Advancing…"
@@ -637,13 +637,13 @@ export default function FeatureDetailPage() {
 
               {/* QA_APPROVED: no separate advance button — plan generation handles the transition */}
               {isQaApproved && !showGenForm && (
-                <p className="text-center text-xs text-gray-400 py-2">
+                <p className="text-center text-xs text-gray-400 py-2 mt-6">
                   Generate a development plan above to advance to Dev stage.
                 </p>
               )}
 
               {!nextStatus && (
-                <div className="text-center py-3 text-green-600 font-semibold text-sm">
+                <div className="text-center py-3 text-green-600 font-semibold text-sm mt-6">
                   ✓ This task is complete
                 </div>
               )}
