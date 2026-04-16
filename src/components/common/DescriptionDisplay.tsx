@@ -30,7 +30,7 @@ const DescriptionDisplay: React.FC<DescriptionDisplayProps> = ({
 
     const truncateStyle: React.CSSProperties = !showReadMore ? {
         display: '-webkit-box',
-        WebkitLineClamp: lineLimit,
+        WebkitLineClamp: lineLimit, 
         WebkitBoxOrient: 'vertical',
         overflow: 'hidden',
         textOverflow: 'ellipsis'
