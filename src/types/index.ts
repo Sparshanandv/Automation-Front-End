@@ -27,7 +27,8 @@ export interface Project {
   id: string
   name: string
   description: string
-  repositories: Repository[]
+  projectKey?: string
+  repositories?: Repository[]
 }
 
 export interface StatusHistoryEntry {
@@ -38,11 +39,15 @@ export interface StatusHistoryEntry {
 
 export interface Feature {
   id: string
+  featureKey: string
   title: string
+  type: string
   description: string
   criteria: string
   status: FeatureStatus
+  createdBy: { id: string; email: string }
   statusHistory: StatusHistoryEntry[]
+  projectId: string | null
   createdAt: string
   updatedAt: string
 }
@@ -70,13 +75,6 @@ export interface QAGenerationResponse {
   createdAt: string
   updatedAt: string
 }
-
-export interface TestCase {
-  id: string
-  feature_id: string
-  content: any
-}
-
 export interface Plan {
   _id: string
   feature_id: string

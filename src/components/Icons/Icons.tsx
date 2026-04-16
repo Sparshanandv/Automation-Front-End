@@ -1,33 +1,44 @@
-import React from 'react'
+import React from "react";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
-  size?: number | string
+  size?: number | string;
 }
 
 export const Icons = {
-  Spinner: ({ className = '', size = 16, ...props }: IconProps) => (
-    <svg 
-      className={`animate-spin ${className}`} 
+  Spinner: ({ className = "", size = 16, ...props }: IconProps) => (
+    <svg
+      className={`animate-spin ${className}`}
       style={{ width: size, height: size }}
-      viewBox="0 0 24 24" 
-      fill="none" 
+      viewBox="0 0 24 24"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
     </svg>
   ),
 
   EyeOpen: ({ size = 16, ...props }: IconProps) => (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
       strokeLinejoin="round"
       {...props}
     >
@@ -37,14 +48,14 @@ export const Icons = {
   ),
 
   EyeClosed: ({ size = 16, ...props }: IconProps) => (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
       strokeLinejoin="round"
       {...props}
     >
@@ -55,11 +66,11 @@ export const Icons = {
   ),
 
   Close: ({ size = 24, ...props }: IconProps) => (
-    <svg 
-      width={size} 
-      height={size} 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
       viewBox="0 0 24 24"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -71,10 +82,10 @@ export const Icons = {
   ),
 
   GitHub: ({ size = 20, ...props }: IconProps) => (
-    <svg 
-      width={size} 
-      height={size} 
-      fill="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      fill="currentColor"
       viewBox="0 0 24 24"
       {...props}
     >
@@ -83,11 +94,11 @@ export const Icons = {
   ),
 
   Branch: ({ size = 20, ...props }: IconProps) => (
-    <svg 
-      width={size} 
-      height={size} 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
       viewBox="0 0 24 24"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -101,11 +112,11 @@ export const Icons = {
   ),
 
   Trash: ({ size = 20, ...props }: IconProps) => (
-    <svg 
-      width={size} 
-      height={size} 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
       viewBox="0 0 24 24"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -119,11 +130,11 @@ export const Icons = {
   ),
 
   Lock: ({ size = 16, ...props }: IconProps) => (
-    <svg 
-      width={size} 
-      height={size} 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
       viewBox="0 0 24 24"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -136,11 +147,11 @@ export const Icons = {
   ),
 
   Unlock: ({ size = 16, ...props }: IconProps) => (
-    <svg 
-      width={size} 
-      height={size} 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
       viewBox="0 0 24 24"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -153,11 +164,11 @@ export const Icons = {
   ),
 
   Plus: ({ size = 16, ...props }: IconProps) => (
-    <svg 
-      width={size} 
-      height={size} 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
       viewBox="0 0 24 24"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -170,11 +181,11 @@ export const Icons = {
   ),
 
   Link: ({ size = 16, ...props }: IconProps) => (
-    <svg 
-      width={size} 
-      height={size} 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
       viewBox="0 0 24 24"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -187,11 +198,11 @@ export const Icons = {
   ),
 
   Folder: ({ size = 16, ...props }: IconProps) => (
-    <svg 
-      width={size} 
-      height={size} 
-      fill="none" 
-      stroke="currentColor" 
+    <svg
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
       viewBox="0 0 24 24"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -201,4 +212,20 @@ export const Icons = {
       <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
     </svg>
   ),
-}
+
+  Edit: ({ size = 20, ...props }: IconProps) => (
+    <svg
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      {...props}
+    >
+      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+    </svg>
+  ),
+};

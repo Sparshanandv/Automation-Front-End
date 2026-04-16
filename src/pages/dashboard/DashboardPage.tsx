@@ -8,6 +8,7 @@ import CreateProjectModal from '../../components/Modals/CreateProjectModal'
 import Button from '../../components/Button/Button'
 import Card from '../../components/Card/Card'
 import { Project } from '../../types/project'
+import { stripHtml } from '../../utils/stringUtils'
 
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -32,7 +33,7 @@ export default function DashboardPage() {
     }
   }
 
-  const handleCreateProject = async (data: { name: string; description: string }) => {
+  const handleCreateProject = async (data: { name: string; description: string; githubToken: string }) => {
     try {
       await api.post('/projects', data)
       setIsModalOpen(false)
@@ -46,13 +47,13 @@ export default function DashboardPage() {
     <PageWrapper>
       <div className="mb-6">
         <div className="flex justify-between items-center mb-8">
-         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Your Projects</h2>
-          <p className="text-sm text-gray-500 mt-1">Manage your active projects and repositories.</p>
-        </div>
-        <Button onClick={() => setIsModalOpen(true)}>
-          + New Project
-        </Button>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Your Projects</h2>
+            <p className="text-sm text-gray-500 mt-1">Manage your active projects and repositories.</p>
+          </div>
+          <Button onClick={() => setIsModalOpen(true)}>
+            + New Project
+          </Button>
         </div>
       </div>
 
@@ -74,15 +75,31 @@ export default function DashboardPage() {
             <Link
               key={project._id}
               to={`/projects/${project._id}`}
-              className="block hover:shadow-md transition-shadow"
+              className="block hover:shadow-md transition-shadow rounded-2xl"
             >
               <Card className="h-full hover:border-blue-300 transition-colors">
-                <h3 className="text-lg font-semibold text-gray-900 truncate mb-2">{project.name}</h3>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-lg font-semibold text-gray-900 truncate flex-1">{project.name}</h3>
+                  {project.projectKey && (
+                    <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded ml-2 shrink-0">
+                      {project.projectKey}
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-gray-500 mb-4 line-clamp-2 min-h-10">
-                  {project.description || 'No description provided.'}
+                  {project.description ? stripHtml(project.description) : 'No description provided.'}
                 </p>
                 <div className="flex justify-between items-center text-xs text-gray-400">
                   <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>
+                  {project.createdByEmail && (
+                    <span className="flex items-center gap-1 min-w-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                      <span className="truncate max-w-[120px]">{project.createdByEmail}</span>
+                    </span>
+                  )}
                 </div>
               </Card>
             </Link>
