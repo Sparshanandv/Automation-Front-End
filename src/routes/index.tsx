@@ -8,10 +8,14 @@ import RepositoryDetailsPage from '../pages/repository/RepositoryDetailsPage'
 import FeaturesPage from '../pages/features/FeaturesPage'
 import FeatureDetailPage from '../pages/features/FeatureDetailPage'
 import PullRequestsPage from '../pages/PullRequestsPage'
+import HelloWorldPage from '../pages/HelloWorldPage'
 
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* Standalone public routes */}
+      <Route path="/hello-world" element={<HelloWorldPage />} />
+
       {/* Public routes — redirect to /dashboard if already logged in */}
       <Route element={<PublicLayout />}>
         <Route path="/login" element={<AuthPage />} />
