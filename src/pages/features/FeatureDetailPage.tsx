@@ -99,7 +99,7 @@ export default function FeatureDetailPage() {
       setPlanLoading(true)
       setPlanError('')
       aiService.getPlan(id)
-        .then(p => setPlan(p.plan))
+        .then(p => setPlan(p.content))
         .catch((error) => {
           setPlan(null)
           if (error.response?.status === 404) {
